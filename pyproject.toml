@@ -2,9 +2,15 @@
 name = "mva_snlp_canine"
 version = "0.1.0"
 description = "NLP project for the MVA course Speech and NLP"
-authors = ["Gabriel Watkinson <gabriel.watkinson@ensae.fr>"]
+authors = [
+  "Gabriel Watkinson <gabriel.watkinson@ensae.fr>",
+  "Josselin Dubois <dubois.josselin2000@gmail.com>",
+  "Marine Astruc <marineastruc09@gmail.com>",
+  "Javier Ramos-Gutierrez <javier.ramos_gutierrez@ens-paris-saclay.fr>"
+]
 readme = "README.md"
-packages = [{include = "mva_snlp_canine", from = "src"}]
+license = "MIT"
+packages = [{include = "mva_snlp_canine"}]
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
