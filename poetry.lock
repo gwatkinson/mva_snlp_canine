@@ -1590,6 +1590,26 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx", "sphinxcontrib-github-al
 test = ["pep440", "pre-commit", "pytest", "testpath"]
 
 [[package]]
+name = "nbqa"
+version = "1.6.3"
+description = "Run any standard Python code quality tool on a Jupyter Notebook"
+category = "dev"
+optional = false
+python-versions = ">=3.8.0"
+files = [
+    {file = "nbqa-1.6.3-py3-none-any.whl", hash = "sha256:f3bac3e6d322b0a9bf2143d5fea8e5c2f7ac7daced717b3407f2e3279f58afbf"},
+    {file = "nbqa-1.6.3.tar.gz", hash = "sha256:5394a29fc6d27b9a950c0a36d2d9de25de980be9acfe2a3f3aea0d27b5f7fec1"},
+]
+
+[package.dependencies]
+ipython = ">=7.8.0"
+tokenize-rt = ">=3.2.0"
+tomli = "*"
+
+[package.extras]
+toolchain = ["black", "blacken-docs", "flake8", "isort", "jupytext", "mypy", "pylint", "pyupgrade", "ruff"]
+
+[[package]]
 name = "nest-asyncio"
 version = "1.5.6"
 description = "Patch asyncio to allow nested event loops"
@@ -3067,4 +3087,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "f69971e8f209bb02109ec117d2e7b2cbba6c2128893007e14f3785ef0a3dcb34"
+content-hash = "563b3c6b3ff39349a43a33f8090eabb1b362ec1e240ef89cf96f127a083b7d82"
