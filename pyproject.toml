@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "mva_snlp_canine"
+version = "0.1.0"
+description = "NLP project for the MVA course Speech and NLP"
+authors = ["Gabriel Watkinson <gabriel.watkinson@ensae.fr>"]
+readme = "README.md"
+packages = [{include = "mva_snlp_canine", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+numpy = "^1.24.2"
+pandas = "^1.5.3"
+matplotlib = "^3.7.1"
+seaborn = "^0.12.2"
+scikit-learn = "^1.2.1"
+torch = "^1.13.1"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+flake8-bugbear = "^23.2.13"
+flake8-comprehensions = "^3.10.1"
+flake8-simplify = "^0.19.3"
+pep8-naming = "^0.13.3"
+black = {extras = ["jupyter"], version = "^23.1.0"}
+pre-commit = "^3.1.1"
+pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+poethepoet = "^0.18.1"
+ipykernel = "^6.21.3"
+ipywidgets = ">=7.0,<8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.poe.tasks]
+init_dev = [
+  { cmd = "poetry install --sync" },
+  { cmd = "pre-commit install" },
+]
+torch_cuda = [
+  { cmd = "poetry add numpy torch" },
+  { cmd = "pip install torch --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu117" },
+]
