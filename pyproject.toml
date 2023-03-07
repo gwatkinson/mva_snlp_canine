@@ -43,7 +43,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
-float-to-top = true
+float_to_top = true
 
 [tool.flake8]
 ignore = ['E203', 'E501']
