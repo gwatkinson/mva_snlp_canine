@@ -39,6 +39,12 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 float-to-top = true
 
+[tool.flake8]
+ignore = ['E203', 'E501']
+max-line-length = 100
+count = true
+docstring-convention = 'google'
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
