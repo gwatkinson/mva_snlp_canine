@@ -20,6 +20,8 @@ matplotlib = "^3.7.1"
 seaborn = "^0.12.2"
 scikit-learn = "^1.2.1"
 torch = "^1.13.1"
+transformers = "^4.26.1"
+datasets = "^2.10.1"
 
 
 [tool.poetry.group.dev.dependencies]
