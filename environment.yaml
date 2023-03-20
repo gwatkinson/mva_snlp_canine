@@ -1,0 +1,63 @@
+name: pytorch-2.0
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  # Environment
+  - python=3.10
+  - pip=22.3.1
+
+  # Pytorch
+  - pytorch=2.0.0
+  - pytorch-cuda=11.7
+  - pytorch-lightning=2.0
+  - transformers = 4.26
+  - datasets = 2.10
+
+  # Other classic data and ML packages
+  - numpy=1.23
+  - pandas=1.5
+  - scipy=1.9
+  - scikit-learn=1.1
+  - umap-learn=0.5
+  - scikit-plot=0.3
+
+  # Plots
+  - tensorboard=2.11
+  - matplotlib=3.6
+  - seaborn=0.12
+  - plotly=5.11
+  - python-kaleido=0.2
+  - streamlit=1.9
+  - rich=13.3
+
+  # CLI
+  - pre-commit=3.0
+  - click=8
+
+  # Jupyter
+  - jupyter=1.0
+  - notebook=6.5
+  - ipywidgets=7.6
+  - jupytext=1.14
+
+  # Formatters
+  - black=22.12
+  - nbqa=1.6
+  - isort=5.11
+  - pylama=7.7
+  - pep8-naming = 0.13
+  - flake8 = 6.0
+  - flake8-bugbear = 23.2
+  - flake8-comprehensions = 3.10
+  - flake8-simplify = 0.19
+
+
+# Non-standard section listing target platforms for conda-lock:
+platforms:
+  - linux-64
+  - win-64
