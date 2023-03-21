@@ -66,4 +66,3 @@ torch_cuda = [
   { cmd = "poetry add numpy torch" },
   { cmd = "pip install torch --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu117" },
 ]
-
