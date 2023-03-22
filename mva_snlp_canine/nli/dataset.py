@@ -1,46 +1,77 @@
-import os
+from pathlib import Path
+from typing import Any
 
-import click
-import numpy as np
 from datasets import DatasetDict, load_dataset
 from huggingface_hub import login
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 
 
-def change_hypothesis_format(example, language_subset):
-    print(example["hypothesis"])
-    example["hypothesis_dict"] = {
-        k: v
-        for k, v in zip(
-            example["hypothesis"]["language"], example["hypothesis"]["translation"]
-        )
-        if k in language_subset
+def change_hypothesis_format(example: Any, language_subset: list[str]):
+    """Change the hypothesis format from a dictionaries of lists to a dictionary.
+
+    Args:
+        example (Any): The example to process from the dataset.
+        language_subset (list[str]): The languages to keep.
+
+    Returns:
+        example: The processed example.
+    """
+    tmp = {
+        "hypothesis_dict": {
+            k: v
+            for k, v in zip(
+                example["hypothesis"]["language"], example["hypothesis"]["translation"]
+            )
+            if k in language_subset
+        }
     }
-    return example
+    return tmp
 
 
 def choose_language(
-    example,
-    languages,
-    probs,
+    example: Any,
+    languages: list[str],
+    probs: list[float],
 ):
+    """Choose a language for the example.
+
+    Args:
+        example (Any): The example to process from the dataset.
+        languages (list[str]): The languages to choose from.
+        probs (list[float]): The probabilities of the languages to choose from. Must sum to 1.
+
+    Returns:
+        example: The processed example.
+    """
     from numpy.random import choice
 
     lang = choice(languages, p=probs)
-    example["language"] = lang
-    example["choosen_premise"] = example["premise"][lang]
-    example["choosen_hypothesis"] = example["hypothesis_dict"][lang]
+    tmp = {
+        "language": lang,
+        "choosen_premise": example["premise"][lang],
+        "choosen_hypothesis": example["hypothesis_dict"][lang],
+    }
 
-    return example
+    return tmp
 
 
-def tokenize_example(example, tokenizer):
-    return tokenizer(
+def tokenize_example(example: Any, tokenizer: Any):
+    """Tokenize the example.
+
+    Args:
+        example (Any): The example to process from the dataset.
+        tokenizer (Any): The tokenizer to use.
+
+    Returns:
+        example: The processed example.
+    """
+    tmp = tokenizer(
         text=example["choosen_premise"],
         text_pair=example["choosen_hypothesis"],
         truncation=True,
     )
+    return tmp
 
 
 def process_dataset(
@@ -51,14 +82,37 @@ def process_dataset(
     train_probs: list[float],
     test_language_subset: list[str],
     test_probs: list[float],
-    save_path: str,
-    push_to_hub: bool,
-    hub_path: str,
+    save_path: str or None,
+    hub_path: str or None,
     seed: int,
     n_jobs: int,
+    no_pbar: bool,
 ):
+    """Apply the preprocessing transformations (sampling and language selection) to the dataset and save it.
+
+    Args:
+        num_train_samples (int): Number of samples to keep in the train set.
+        num_val_samples (int): Number of samples to keep in the validation set.
+        num_test_samples (int): Number of samples to keep in the test set.
+        train_language_subset (list[str]): Languages to keep in the train and validation set.
+        train_probs (list[float]): Probabilities of the languages to keep in the train and validation set.
+        test_language_subset (list[str]): Languages to keep in the test set.
+        test_probs (list[float]): Probabilities of the languages to keep in the test set.
+        save_path (str or None): Save path of the dataset. If None, the dataset is not saved.
+        hub_path (str or None): Save path of the dataset on the hub. If None, the dataset is not pushed to the hub.
+        seed (int): Seed for the random sampling.
+        n_jobs (int): Number of processes to use for the transformations when possible.
+        no_pbar (bool): Whether to display the progress bars.
+
+    Returns:
+        dataset: The processed dataset.
+    """
+    # Load the dataset
+    print("--- Loading the dataset...")
     full_dataset = load_dataset("xnli", "all_languages")
 
+    # Shuffle and select a subset of the dataset
+    print("Shuffling and selecting a subset of the dataset...")
     dataset = DatasetDict(
         {
             "train": full_dataset["train"]
@@ -73,7 +127,9 @@ def process_dataset(
 
     description_postfix = "This dataset is a subset of the XNLI dataset. It contains {num_samples} samples and only the following languages: {language_subset}, with the following probabilities: {probs}."
 
-    for phase in tqdm(["train", "validation", "test"]):
+    # Apply the transformations and add the description
+    print("--- Applying the transformations...")
+    for phase in tqdm(["train", "validation", "test"], disable=no_pbar):
         num_samples = (
             num_train_samples
             if phase == "train"
@@ -100,13 +156,20 @@ def process_dataset(
             num_samples=num_samples, language_subset=language_subset, probs=probs
         )
 
+    # Select the columns we want to keep
     dataset = dataset.select_columns(
         ["language", "choosen_premise", "choosen_hypothesis", "label"]
     )
 
-    dataset.save_to_disk(save_path)
+    # Save the dataset
+    if save_path:
+        print(f"--- Saving the dataset to disk to {save_path}...")
+        save_path = Path(save_path)
+        save_path.mkdir(parents=True, exist_ok=True)
+        dataset.save_to_disk(save_path)
 
-    if push_to_hub:
+    if hub_path:
+        print(f"--- Pushing the dataset to the hub to {hub_path}...")
         login()
         dataset.push_to_hub(hub_path)  # hub_path = "Gwatk/xnli_subset"
 
@@ -114,26 +177,49 @@ def process_dataset(
 
 
 def tokenize_dataset(
-    dataset_name_or_path: str,
+    dataset: Any,
     model_name_or_path: str,
-    save_path: str,
-    push_to_hub: bool,
-    hub_path: str,
+    save_path: str or None,
+    hub_path: str or None,
     n_jobs: int,
+    no_pbar: bool,
 ):
-    dataset = load_dataset(dataset_name_or_path)  # hub_path = "Gwatk/xnli_subset"
+    """Tokenize the dataset and save it.
+
+    Args:
+        dataset (Any): Dataset to tokenize.
+        model_name_or_path (str): Name or path of the model to use for the tokenization.
+        save_path (str | None): Path to save the tokenized dataset. If None, the dataset is not saved.
+        hub_path (str | None): Path to save the tokenized dataset on the hub. If None, the dataset is not pushed to the hub.
+        n_jobs (int): Number of processes to use for the transformations when possible.
+        no_pbar (bool): Whether to display the progress bars.
+    """
+    # Load the dataset and the tokenizer
+    print("--- Loading the dataset and the tokenizer...")
+    # dataset = load_dataset(dataset_name_or_path)  # hub_path = "Gwatk/xnli_subset"
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 
     dataset = dataset.select_columns(["choosen_premise", "choosen_hypothesis", "label"])
 
-    for phase in tqdm(["train", "validation", "test"]):
+    # Tokenize the dataset
+    print("--- Tokenizing the dataset...")
+    for phase in tqdm(["train", "validation", "test"], disable=no_pbar):
         dataset[phase] = dataset[phase].map(
             tokenize_example, num_proc=n_jobs, fn_kwargs={"tokenizer": tokenizer}
         )
 
-    dataset.save_to_disk(save_path)
+    dataset = dataset.select_columns(
+        ["input_ids", "attention_mask", "token_type_ids", "label"]
+    )
 
-    if push_to_hub:
+    if save_path:
+        print(f"--- Saving the dataset to disk to {save_path}...")
+        save_path = Path(save_path)
+        save_path.mkdir(parents=True, exist_ok=True)
+        dataset.save_to_disk(save_path)
+
+    if hub_path:
+        print(f"--- Pushing the dataset to the hub to {hub_path}...")
         login()
         dataset.push_to_hub(
             hub_path

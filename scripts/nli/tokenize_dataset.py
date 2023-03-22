@@ -1,0 +1,97 @@
+import click
+from datasets import load_dataset
+
+from mva_snlp_canine.nli.dataset import tokenize_dataset
+from mva_snlp_canine.nli.defaults import (
+    MODEL_LIST,
+    MODEL_POSTFIX,
+    N_JOBS,
+    NO_PBAR,
+    PREPROCESSING_HUB_PATH,
+    TOKENIZED_HUB_PATH,
+    TOKENIZED_PATH,
+)
+
+
+@click.command()
+@click.option(
+    "--dataset_name_or_path",
+    "-d",
+    default=PREPROCESSING_HUB_PATH,
+    type=str,
+    help="Name or path of the dataset to tokenize.",
+    show_default=True,
+)
+@click.option(
+    "--model_list",
+    "-m",
+    default=MODEL_LIST,
+    type=list[str],
+    help="List of models to use for tokenization.",
+    show_default=True,
+)
+@click.option(
+    "--model_postfix",
+    "-p",
+    default=MODEL_POSTFIX,
+    type=list[str],
+    help="List of prefixes to use for the tokenized datasets.",
+    show_default=True,
+)
+@click.option(
+    "--save_path",
+    "-o",
+    default=TOKENIZED_PATH,
+    type=str,
+    help="Path to save the dataset.",
+    show_default=True,
+)
+@click.option(
+    "--hub_path",
+    "-h",
+    default=TOKENIZED_HUB_PATH,
+    type=str,
+    help="Path to the dataset on the HuggingFace Hub.",
+    show_default=True,
+)
+@click.option(
+    "--n_jobs",
+    "-j",
+    default=N_JOBS,
+    type=int,
+    help="Number of jobs to run in parallel.",
+    show_default=True,
+)
+@click.option(
+    "--no_pbar",
+    default=NO_PBAR,
+    type=bool,
+    help="Disable the progress bar.",
+    show_default=True,
+)
+def main(
+    dataset_name_or_path,
+    model_list,
+    model_postfix,
+    save_path,
+    hub_path,
+    n_jobs,
+    no_pbar,
+):
+    print(f"--- Loading dataset: {dataset_name_or_path}...")
+    dataset = load_dataset(dataset_name_or_path)
+
+    for model_name_or_path, postfix in zip(model_list, model_postfix):
+        print(f"Tokenizing {model_name_or_path}...")
+        tokenize_dataset(
+            dataset,
+            model_name_or_path,
+            save_path.format(postfix=postfix),
+            hub_path.format(postfix=postfix),
+            n_jobs,
+            no_pbar,
+        )
+
+
+if __name__ == "__main__":
+    main()
