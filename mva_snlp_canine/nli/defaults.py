@@ -22,3 +22,9 @@ TOKENIZED_PATH = "data/nli/tokenized/{postfix}"
 
 MODEL_LIST = ["bert-base-multilingual-cased", "google/canine-s", "google/canine-c"]
 MODEL_POSTFIX = ["bert", "canine_s", "canine_c"]
+
+
+N_EPOCHS = 3
+NUM_LABELS = 3
+
+MODEL_OUTPUT_PATH = "models/nli/{postfix}"
