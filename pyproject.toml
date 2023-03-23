@@ -28,6 +28,7 @@ torch = "^2.0.0"
 #   {url = "https://download.pytorch.org/whl/cu117/torch-2.0.0%2Bcu117-cp310-cp310-win_amd64.whl", markers = "sys_platform == 'win32'"}
 # ]
 # torch = {version = "=2.0.0+cu117", source = "torch_source"}
+evaluate = "^0.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -56,6 +57,7 @@ nbqa = "^1.6.3"
 [tool.poetry.scripts]
 nli_process_data = 'scripts.nli.preprocessing:main'
 nli_tokenize_data = 'scripts.nli.tokenize_dataset:main'
+nli_train = 'scripts.nli.train:main'
 
 
 [build-system]
