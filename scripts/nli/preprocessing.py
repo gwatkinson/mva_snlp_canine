@@ -118,8 +118,8 @@ from mva_snlp_canine.nli.defaults import (
     "--token",
     default=TOKEN,
     type=str,
-    help="Path to cached token.",
-    show_default=False,
+    help="Token to login to the hub.",
+    show_default=True,
 )
 def main(
     experiment_name,
