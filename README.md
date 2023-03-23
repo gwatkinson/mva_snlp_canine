@@ -36,7 +36,7 @@ pip install -e .
 pre-commit install
 ```
 
-4. Use Pytorch with GPU support (optional). This reinstalls Pytorch in the virtual environment, and needs to be rerun after each modification of the environment.
+4. Use Pytorch with GPU support (optional). Use this if Pytorch doesn't see your GPU. This reinstalls Pytorch in the virtual environment, and needs to be rerun after each modification of the environment.
 ```bash
 poe torch_cuda
 ```
