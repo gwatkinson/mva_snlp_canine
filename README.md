@@ -114,3 +114,17 @@ Options:
   --token TEXT                      Token to login to the hub.  [default:None]
   --help                            Show this message and exit.
 ```
+
+#### Train and evaluate the models
+
+To train and evaluate the models, run the following command :
+```bash
+nli_train EXPERIMENT_NAME
+```
+
+Usage:
+```bash
+Usage: nli_train [OPTIONS] EXPERIMENT_NAME
+
+...
+```

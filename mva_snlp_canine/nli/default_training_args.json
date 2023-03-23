@@ -1,0 +1,13 @@
+{
+  "evaluation_strategy": "epoch",
+  "overwrite_output_dir": false,
+  "gradient_checkpointing": true,
+  "fp16": false,
+  "do_train": true,
+  "do_eval": true,
+  "learning_rate": 5e-4,
+  "gradient_accumulation_steps": 8,
+  "per_device_train_batch_size": 4,
+  "per_device_eval_batch_size": 4,
+  "num_train_epochs": 3
+}
