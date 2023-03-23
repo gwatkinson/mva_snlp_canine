@@ -8,12 +8,14 @@ from mva_snlp_canine.nli.defaults import (
     N_JOBS,
     NO_PBAR,
     PREPROCESSING_HUB_PATH,
+    TOKEN,
     TOKENIZED_HUB_PATH,
     TOKENIZED_PATH,
 )
 
 
 @click.command()
+@click.argument("experiment_name", type=str)
 @click.option(
     "--dataset_name_or_path",
     "-d",
@@ -69,7 +71,15 @@ from mva_snlp_canine.nli.defaults import (
     help="Disable the progress bar.",
     show_default=True,
 )
+@click.option(
+    "--token",
+    default=TOKEN,
+    type=str,
+    help="Path to cached token.",
+    show_default=True,
+)
 def main(
+    experiment_name,
     dataset_name_or_path,
     model_list,
     model_postfix,
@@ -77,19 +87,30 @@ def main(
     hub_path,
     n_jobs,
     no_pbar,
+    token,
 ):
-    print(f"--- Loading dataset: {dataset_name_or_path}...")
-    dataset = load_dataset(dataset_name_or_path)
+    dataset_path = dataset_name_or_path.format(experiment_name=experiment_name)
+    print(f"--- Loading dataset: {dataset_path}...")
+    dataset = load_dataset(dataset_path)
 
     for model_name_or_path, postfix in zip(model_list, model_postfix):
         print(f"Tokenizing {model_name_or_path}...")
+
+        token_save_path = save_path.format(
+            experiment_name=experiment_name, postfix=postfix
+        )
+        token_hub_path = hub_path.format(
+            experiment_name=experiment_name, postfix=postfix
+        )
+
         tokenize_dataset(
-            dataset,
-            model_name_or_path,
-            save_path.format(postfix=postfix),
-            hub_path.format(postfix=postfix),
-            n_jobs,
-            no_pbar,
+            dataset=dataset,
+            model_name_or_path=model_name_or_path,
+            save_path=token_save_path,
+            hub_path=token_hub_path,
+            n_jobs=n_jobs,
+            no_pbar=no_pbar,
+            token=token,
         )
 
 

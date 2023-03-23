@@ -1,5 +1,9 @@
 """Default values for the NLI dataset processing."""
 
+from pathlib import Path
+
+from huggingface_hub.constants import HF_TOKEN_PATH
+
 TRAIN_LANGUAGES_SUBSET = ["en", "fr", "ar", "hi", "el", "ru", "tr", "zh"]
 TRAIN_PROBS = [0.5, 0.3, 0.05, 0.05, 0.025, 0.025, 0.025, 0.025]
 
@@ -14,11 +18,11 @@ SEED = 123
 N_JOBS = 12
 NO_PBAR = False
 
-PREPROCESSING_PATH = "data/nli/processed_dataset"
-PREPROCESSING_HUB_PATH = "Gwatk/xnli_subset"
+PREPROCESSING_PATH = "nli_results/{experiment_name}/data/processed_dataset"
+PREPROCESSING_HUB_PATH = "Gwatk/{experiment_name}_xnli_subset"
 
-TOKENIZED_HUB_PATH = "Gwatk/xnli_subset_tokenized_{postfix}"
-TOKENIZED_PATH = "data/nli/tokenized/{postfix}"
+TOKENIZED_HUB_PATH = "Gwatk/{experiment_name}_xnli_subset_tokenized_{postfix}"
+TOKENIZED_PATH = "nli_results/{experiment_name}/data/tokenized/{postfix}"
 
 MODEL_LIST = ["bert-base-multilingual-cased", "google/canine-s", "google/canine-c"]
 MODEL_POSTFIX = ["bert", "canine_s", "canine_c"]
@@ -27,4 +31,11 @@ MODEL_POSTFIX = ["bert", "canine_s", "canine_c"]
 N_EPOCHS = 3
 NUM_LABELS = 3
 
-MODEL_OUTPUT_PATH = "models/nli/{postfix}"
+MODEL_OUTPUT_PATH = "nli_results/{experiment_name}/models/{postfix}"
+
+
+token_path = Path(HF_TOKEN_PATH)
+if token_path.exists():
+    TOKEN = token_path.read_text()
+else:
+    TOKEN = None

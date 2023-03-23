@@ -12,12 +12,14 @@ from mva_snlp_canine.nli.defaults import (
     SEED,
     TEST_LANGUAGES_SUBSET,
     TEST_PROBS,
+    TOKEN,
     TRAIN_LANGUAGES_SUBSET,
     TRAIN_PROBS,
 )
 
 
 @click.command()
+@click.argument("experiment_name", type=str)
 @click.option(
     "--num_train_samples",
     "-nt",
@@ -112,7 +114,15 @@ from mva_snlp_canine.nli.defaults import (
     help="Disable the progress bar.",
     show_default=True,
 )
+@click.option(
+    "--token",
+    default=TOKEN,
+    type=str,
+    help="Path to cached token.",
+    show_default=False,
+)
 def main(
+    experiment_name,
     num_train_samples,
     num_val_samples,
     num_test_samples,
@@ -125,7 +135,11 @@ def main(
     seed,
     n_jobs,
     no_pbar,
+    token,
 ):
+    experiment_path = save_path.format(experiment_name=experiment_name)
+    experiment_hub_path = hub_path.format(experiment_name=experiment_name)
+
     process_dataset(
         num_train_samples=num_train_samples,
         num_val_samples=num_val_samples,
@@ -134,11 +148,12 @@ def main(
         train_probs=train_probs,
         test_language_subset=test_language_subset,
         test_probs=test_probs,
-        save_path=save_path,
-        hub_path=hub_path,
+        save_path=experiment_path,
+        hub_path=experiment_hub_path,
         seed=seed,
         n_jobs=n_jobs,
         no_pbar=no_pbar,
+        token=token,
     )
 
 

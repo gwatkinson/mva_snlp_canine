@@ -87,6 +87,7 @@ def process_dataset(
     seed: int,
     n_jobs: int,
     no_pbar: bool,
+    token: str or None,
 ):
     """Apply the preprocessing transformations (sampling and language selection) to the dataset and save it.
 
@@ -103,6 +104,7 @@ def process_dataset(
         seed (int): Seed for the random sampling.
         n_jobs (int): Number of processes to use for the transformations when possible.
         no_pbar (bool): Whether to display the progress bars.
+        token (str or None): Path to the cached file containing the token to login to the hub.
 
     Returns:
         dataset: The processed dataset.
@@ -170,7 +172,7 @@ def process_dataset(
 
     if hub_path:
         print(f"--- Pushing the dataset to the hub to {hub_path}...")
-        login()
+        login(token=token)
         dataset.push_to_hub(hub_path)  # hub_path = "Gwatk/xnli_subset"
 
     return dataset
@@ -183,16 +185,18 @@ def tokenize_dataset(
     hub_path: str or None,
     n_jobs: int,
     no_pbar: bool,
+    token: str or None,
 ):
     """Tokenize the dataset and save it.
 
     Args:
         dataset (Any): Dataset to tokenize.
         model_name_or_path (str): Name or path of the model to use for the tokenization.
-        save_path (str | None): Path to save the tokenized dataset. If None, the dataset is not saved.
-        hub_path (str | None): Path to save the tokenized dataset on the hub. If None, the dataset is not pushed to the hub.
+        save_path (str or None): Path to save the tokenized dataset. If None, the dataset is not saved.
+        hub_path (str or None): Path to save the tokenized dataset on the hub. If None, the dataset is not pushed to the hub.
         n_jobs (int): Number of processes to use for the transformations when possible.
         no_pbar (bool): Whether to display the progress bars.
+        token (str or None): Path to the cached file containing the token to login to the hub.
     """
     # Load the dataset and the tokenizer
     print("--- Loading the dataset and the tokenizer...")
@@ -220,7 +224,7 @@ def tokenize_dataset(
 
     if hub_path:
         print(f"--- Pushing the dataset to the hub to {hub_path}...")
-        login()
+        login(token=token)
         dataset.push_to_hub(
             hub_path
         )  # hub_path = "Gwatk/xnli_subset_canine-c_tokenized"
