@@ -1,6 +1,7 @@
+from typing import Any
+
 import numpy as np
 import torch
-from datasets import load_dataset
 from huggingface_hub import login
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from transformers import (
@@ -11,18 +12,47 @@ from transformers import (
     TrainingArguments,
 )
 
+from mva_snlp_canine.nli.dataset import tokenize_dataset
+
+
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)
+
+    scores = {
+        "accuracy": accuracy_score(labels, predictions),
+        "f1_weighted": f1_score(labels, predictions, average="weighted"),
+        "precision_weighted": precision_score(labels, predictions, average="weighted"),
+        "recall_weighted": recall_score(labels, predictions, average="weighted"),
+    }
+
+    return scores
+
 
 def finetune_model(
     model_name_or_path: str,
-    dataset_name_or_path: str,
+    dataset: Any,
+    dataset_is_tokenized: bool,
     num_labels: int,
-    output_dir: str,
     training_kwargs: dict,
+    output_dir: str,
+    save_local: bool,
     hub_path: str,
+    push_to_hub: bool,
     token: str,
 ):
-    print(f"--- Loading the dataset from {dataset_name_or_path}...")
-    dataset = load_dataset(dataset_name_or_path)
+    if not dataset_is_tokenized:
+        print("--- Tokenizing the dataset...")
+        dataset = tokenize_dataset(
+            dataset=dataset,
+            model_name_or_path=model_name_or_path,
+            save_path=None,
+            hub_path=None,
+            n_jobs=12,
+            no_pbar=False,
+            push_to_hub=False,
+            token=None,
+        )
 
     print(f"--- Loading the model {model_name_or_path}...")
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -36,12 +66,10 @@ def finetune_model(
     print(f"--- Cuda is available: {torch.cuda.is_available()}")
 
     print("--- Preparing the training...")
-    if hub_path:
+    if push_to_hub:
         exp_name = hub_path
-        push_to_hub = True
     else:
         exp_name = output_dir
-        push_to_hub = False
 
     training_args = TrainingArguments(
         output_dir=exp_name,
@@ -49,29 +77,7 @@ def finetune_model(
         **training_kwargs,
     )
 
-    # clf_metrics = evaluate.combine([
-    #     evaluate.load("accuracy", average="weighted"),
-    #     evaluate.load("f1", average="weighted"),
-    #     evaluate.load("precision", average="weighted"),
-    #     evaluate.load("recall", average="weighted"),
-    # ])
-
-    def compute_metrics(eval_pred):
-        logits, labels = eval_pred
-        predictions = np.argmax(logits, axis=-1)
-
-        scores = {
-            "accuracy": accuracy_score(labels, predictions),
-            "f1_weighted": f1_score(labels, predictions, average="weighted"),
-            "precision_weighted": precision_score(
-                labels, predictions, average="weighted"
-            ),
-            "recall_weighted": recall_score(labels, predictions, average="weighted"),
-        }
-
-        return scores
-
-    if hub_path:
+    if push_to_hub:
         login(token=token)
 
     trainer = Trainer(
@@ -87,8 +93,11 @@ def finetune_model(
     print(f"--- Training the model, pushing to {hub_path}...")
     trainer.train()
 
-    if hub_path:
-        trainer.push_to_hub()
-    else:
+    if save_local:
+        print("--- Saving the model locally...")
         trainer.save_state()
-        trainer.save_model(exp_name)
+        trainer.save_model(output_dir)
+
+    if push_to_hub:
+        print("--- Pushing the model to the hub...")
+        trainer.push_to_hub()

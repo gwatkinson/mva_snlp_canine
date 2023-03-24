@@ -87,6 +87,8 @@ def process_dataset(
     seed: int,
     n_jobs: int,
     no_pbar: bool,
+    save_local: bool,
+    push_to_hub: bool,
     token: str or None,
 ):
     """Apply the preprocessing transformations (sampling and language selection) to the dataset and save it.
@@ -104,6 +106,8 @@ def process_dataset(
         seed (int): Seed for the random sampling.
         n_jobs (int): Number of processes to use for the transformations when possible.
         no_pbar (bool): Whether to display the progress bars.
+        save_local (bool): Whether to save the dataset locally.
+        push_to_hub (bool): Whether to push the dataset to the hub.
         token (str or None): Token to login to the hub.
 
     Returns:
@@ -164,13 +168,13 @@ def process_dataset(
     )
 
     # Save the dataset
-    if save_path:
+    if save_local:
         print(f"--- Saving the dataset to disk to {save_path}...")
         save_path = Path(save_path)
         save_path.mkdir(parents=True, exist_ok=True)
         dataset.save_to_disk(save_path)
 
-    if hub_path:
+    if push_to_hub:
         print(f"--- Pushing the dataset to the hub to {hub_path}...")
         login(token=token)
         dataset.push_to_hub(hub_path)  # hub_path = "Gwatk/xnli_subset"
@@ -185,6 +189,8 @@ def tokenize_dataset(
     hub_path: str or None,
     n_jobs: int,
     no_pbar: bool,
+    save_local: bool,
+    push_to_hub: bool,
     token: str or None,
 ):
     """Tokenize the dataset and save it.
@@ -196,6 +202,8 @@ def tokenize_dataset(
         hub_path (str or None): Path to save the tokenized dataset on the hub. If None, the dataset is not pushed to the hub.
         n_jobs (int): Number of processes to use for the transformations when possible.
         no_pbar (bool): Whether to display the progress bars.
+        save_local (bool): Whether to save the dataset locally.
+        push_to_hub (bool): Whether to push the dataset to the hub.
         token (str or None): Token to login to the hub.
     """
     # Load the dataset and the tokenizer
@@ -216,15 +224,17 @@ def tokenize_dataset(
         ["input_ids", "attention_mask", "token_type_ids", "label"]
     )
 
-    if save_path:
+    if save_local:
         print(f"--- Saving the dataset to disk to {save_path}...")
         save_path = Path(save_path)
         save_path.mkdir(parents=True, exist_ok=True)
         dataset.save_to_disk(save_path)
 
-    if hub_path:
+    if push_to_hub:
         print(f"--- Pushing the dataset to the hub to {hub_path}...")
         login(token=token)
         dataset.push_to_hub(
             hub_path
         )  # hub_path = "Gwatk/xnli_subset_canine-c_tokenized"
+
+    return dataset
