@@ -1,13 +1,13 @@
 import click
 
 from mva_snlp_canine.nli.dataset import process_dataset
-from mva_snlp_canine.utils import load_config
+from mva_snlp_canine.utils import load_config_nli
 
 
 @click.command()
 @click.argument("config_file_path", type=str)
 def main(config_file_path):
-    cfg = load_config(config_file_path)
+    cfg = load_config_nli(config_file_path)
 
     process_dataset(
         num_train_samples=cfg.NUM_TRAIN_SAMPLES,

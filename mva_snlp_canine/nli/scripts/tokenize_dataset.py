@@ -1,13 +1,13 @@
 import click
 
 from mva_snlp_canine.nli.dataset import tokenize_dataset
-from mva_snlp_canine.utils import load_config, load_dataset_from_config
+from mva_snlp_canine.utils import load_config_nli, load_dataset_from_config
 
 
 @click.command()
 @click.argument("config_file_path", type=str)
 def main(config_file_path):
-    cfg = load_config(config_file_path)
+    cfg = load_config_nli(config_file_path)
 
     dataset = load_dataset_from_config(cfg, "tokenized")
 

@@ -1,13 +1,13 @@
 import click
 
 from mva_snlp_canine.nli.training import finetune_model
-from mva_snlp_canine.utils import load_config, load_dataset_from_config
+from mva_snlp_canine.utils import load_config_nli, load_dataset_from_config
 
 
 @click.command()
 @click.argument("config_file_path", type=str)
 def main(config_file_path):
-    cfg = load_config(config_file_path)
+    cfg = load_config_nli(config_file_path)
     dataset_is_tokenized = cfg.DATASET_IS_TOKENISED
 
     model_list = cfg.MODEL_LIST

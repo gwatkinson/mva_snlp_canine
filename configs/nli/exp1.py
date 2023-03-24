@@ -32,8 +32,7 @@ Variables:
 
     NUM_LABELS: Number of labels in the NLI dataset.
 
-    TRAINING_KWARGS: Default
-
+    TRAINING_KWARGS: Default values for the training parameters.
 """
 
 from mva_snlp_canine.utils import get_token

@@ -16,7 +16,7 @@ def get_token(path: str = HF_TOKEN_PATH):
         return None
 
 
-def check_config(config):
+def check_config_nli(config):
     """Check if the needed variables are defined in the config."""
     attribute_list = [
         "EXPERIMENT_NAME",
@@ -53,10 +53,10 @@ def check_config(config):
     return missing_attributes
 
 
-def load_config(config_file_path):
+def load_config_nli(config_file_path):
     """Load the config file."""
     module = import_module(config_file_path)
-    missing_attributes = check_config(module)
+    missing_attributes = check_config_nli(module)
     assert len(missing_attributes) == 0, f"Missing attributes: {missing_attributes}"
     return module
 
