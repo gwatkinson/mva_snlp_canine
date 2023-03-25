@@ -35,6 +35,7 @@ def main(config_file_path):
             hub_path=experiment_hub_path,
             push_to_hub=cfg.PUSH_TO_HUB,
             token=cfg.TOKEN,
+            dataset_name=cfg.HUB_PATH_PREPROCESSED_DATASET,
         )
 
 

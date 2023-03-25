@@ -114,11 +114,11 @@ def process_dataset(
         dataset: The processed dataset.
     """
     # Load the dataset
-    print("--- Loading the dataset...")
+    print("\n--- Loading the dataset...")
     full_dataset = load_dataset("xnli", "all_languages")
 
     # Shuffle and select a subset of the dataset
-    print("Shuffling and selecting a subset of the dataset...")
+    print("\n--- Shuffling and selecting a subset of the dataset...")
     dataset = DatasetDict(
         {
             "train": full_dataset["train"]
@@ -134,7 +134,7 @@ def process_dataset(
     description_postfix = "This dataset is a subset of the XNLI dataset. It contains {num_samples} samples and only the following languages: {language_subset}, with the following probabilities: {probs}."
 
     # Apply the transformations and add the description
-    print("--- Applying the transformations...")
+    print("\n--- Applying the transformations...")
     for phase in tqdm(["train", "validation", "test"], disable=no_pbar):
         num_samples = (
             num_train_samples
@@ -169,13 +169,13 @@ def process_dataset(
 
     # Save the dataset
     if save_local:
-        print(f"--- Saving the dataset to disk to {save_path}...")
+        print(f"\n--- Saving the dataset to disk to {save_path}...")
         save_path = Path(save_path)
         save_path.mkdir(parents=True, exist_ok=True)
         dataset.save_to_disk(save_path)
 
     if push_to_hub:
-        print(f"--- Pushing the dataset to the hub to {hub_path}...")
+        print(f"\n--- Pushing the dataset to the hub to {hub_path}...")
         login(token=token)
         dataset.push_to_hub(hub_path)  # hub_path = "Gwatk/xnli_subset"
 
@@ -207,14 +207,14 @@ def tokenize_dataset(
         token (str or None): Token to login to the hub.
     """
     # Load the dataset and the tokenizer
-    print("--- Loading the dataset and the tokenizer...")
+    print("\n--- Loading the tokenizer...")
     # dataset = load_dataset(dataset_name_or_path)  # hub_path = "Gwatk/xnli_subset"
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
 
     dataset = dataset.select_columns(["choosen_premise", "choosen_hypothesis", "label"])
 
     # Tokenize the dataset
-    print("--- Tokenizing the dataset...")
+    print("\n--- Tokenizing the dataset...")
     for phase in tqdm(["train", "validation", "test"], disable=no_pbar):
         dataset[phase] = dataset[phase].map(
             tokenize_example, num_proc=n_jobs, fn_kwargs={"tokenizer": tokenizer}
@@ -225,16 +225,14 @@ def tokenize_dataset(
     )
 
     if save_local:
-        print(f"--- Saving the dataset to disk to {save_path}...")
+        print(f"\n--- Saving the dataset to disk to {save_path}...")
         save_path = Path(save_path)
         save_path.mkdir(parents=True, exist_ok=True)
         dataset.save_to_disk(save_path)
 
     if push_to_hub:
-        print(f"--- Pushing the dataset to the hub to {hub_path}...")
+        print(f"\n--- Pushing the dataset to the hub to {hub_path}...")
         login(token=token)
-        dataset.push_to_hub(
-            hub_path
-        )  # hub_path = "Gwatk/xnli_subset_canine-c_tokenized"
+        dataset.push_to_hub(hub_path)
 
     return dataset

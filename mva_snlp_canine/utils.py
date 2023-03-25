@@ -7,13 +7,20 @@ from huggingface_hub.constants import HF_TOKEN_PATH
 
 def get_token(path: str = HF_TOKEN_PATH):
     """Get the token from the environment variable."""
+    if path is None:
+        return None
     token_path = Path(path)
     if token_path.exists():
         print(f"---Found token at {path}.")
         return token_path.read_text()
     else:
-        print(f"---No token found at {path}.")
-        return None
+        token_path = Path.home() / ".cache/huggingface/token"
+        if token_path.exists():
+            print(f"---Found token at {token_path}.")
+            return token_path.read_text()
+        else:
+            print(f"---No token found at {path}.")
+            return None
 
 
 def check_config_nli(config):
@@ -53,9 +60,13 @@ def check_config_nli(config):
     return missing_attributes
 
 
-def load_config_nli(config_file_path):
+def load_config_nli(config_file_name):
     """Load the config file."""
-    module = import_module(config_file_path)
+    config_file_path = Path("mva_snlp_canine/nli/configs") / f"{config_file_name}.py"
+    assert config_file_path.exists(), f"Config file not found: {config_file_path}"
+
+    module_name = str(config_file_path).replace("/", ".").replace(".py", "")
+    module = import_module(module_name)
     missing_attributes = check_config_nli(module)
     assert len(missing_attributes) == 0, f"Missing attributes: {missing_attributes}"
     return module

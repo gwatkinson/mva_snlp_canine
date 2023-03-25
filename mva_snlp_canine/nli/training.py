@@ -40,6 +40,7 @@ def finetune_model(
     hub_path: str,
     push_to_hub: bool,
     token: str,
+    dataset_name: str,
 ):
     if not dataset_is_tokenized:
         print("--- Tokenizing the dataset...")
@@ -50,30 +51,29 @@ def finetune_model(
             hub_path=None,
             n_jobs=12,
             no_pbar=False,
+            save_local=False,
             push_to_hub=False,
             token=None,
         )
 
-    print(f"--- Loading the model {model_name_or_path}...")
+    print(f"\n--- Loading the model {model_name_or_path}...")
     model = AutoModelForSequenceClassification.from_pretrained(
         model_name_or_path, num_labels=num_labels
     )
 
-    print("--- Loading the tokenizer...")
+    print("\n--- Loading the tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, pad_to_multiple_of=4)
 
-    print(f"--- Cuda is available: {torch.cuda.is_available()}")
+    print(f"\n--- Cuda is available: {torch.cuda.is_available()}")
 
-    print("--- Preparing the training...")
-    if push_to_hub:
-        exp_name = hub_path
-    else:
-        exp_name = output_dir
-
+    print("\n--- Preparing the training...")
     training_args = TrainingArguments(
-        output_dir=exp_name,
+        output_dir=output_dir,
+        hub_model_id=hub_path,
+        hub_strategy="end",
         push_to_hub=push_to_hub,
+        hub_token=token,
         **training_kwargs,
     )
 
@@ -90,14 +90,23 @@ def finetune_model(
         data_collator=data_collator,
     )
 
-    print(f"--- Training the model, pushing to {hub_path}...")
+    print(f"\n--- Training the model, pushing to {hub_path}...")
     trainer.train()
 
+    print("\n--- Evaluating the model...")
+    predictions, label_ids, metrics = trainer.predict(dataset["test"])
+    trainer.log_metrics("test", metrics)
+
+    print("\n--- Creating the model card...")
+    trainer.create_model_card(
+        language="multilingual", finetuned_from=model_name_or_path, dataset=dataset_name
+    )
+
     if save_local:
-        print("--- Saving the model locally...")
+        print("\n--- Saving the model locally...")
         trainer.save_state()
-        trainer.save_model(output_dir)
+        # trainer.save_model(output_dir)
 
     if push_to_hub:
-        print("--- Pushing the model to the hub...")
-        trainer.push_to_hub()
+        print("\n--- Pushing the model to the hub...")
+        trainer.push_to_hub(blocking=False)
