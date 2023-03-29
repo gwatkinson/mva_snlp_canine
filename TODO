@@ -1,0 +1,5 @@
+Experiments:
+    ☐ Try using different optimizers and schedulers
+    ☐ Try using optuna to find the best hyperparameters on a subset
+    ☐ Create a script to generate some test sets by language
+    ☐ Train models on different languages and combinations of languages and evaluate them
