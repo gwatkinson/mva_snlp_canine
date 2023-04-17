@@ -14,4 +14,11 @@ jobs:
       - name: Update diagram
         uses: githubocto/repo-visualizer@main
         with:
+          output_file: "images/diagram.svg"
           excluded_paths: "ignore,.github"
+          artifact_name: "my-diagram"
+      - name: Get artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: "my-diagram"
+          path: "downloads"
