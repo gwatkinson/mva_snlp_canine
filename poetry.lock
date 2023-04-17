@@ -13,6 +13,35 @@ files = [
 ]
 
 [[package]]
+name = "accelerate"
+version = "0.18.0"
+description = "Accelerate"
+category = "main"
+optional = false
+python-versions = ">=3.7.0"
+files = [
+    {file = "accelerate-0.18.0-py3-none-any.whl", hash = "sha256:41a84ac94407d7dcf030caf0cdadc70496594aec27ea680207bdb15b95f8a602"},
+    {file = "accelerate-0.18.0.tar.gz", hash = "sha256:1dd36fd972de4a6d0cffe5e4d6d30622fd853765f773b5582cf0796deefe1016"},
+]
+
+[package.dependencies]
+numpy = ">=1.17"
+packaging = ">=20.0"
+psutil = "*"
+pyyaml = "*"
+torch = ">=1.4.0"
+
+[package.extras]
+dev = ["black (>=23.1,<24.0)", "datasets", "deepspeed", "evaluate", "hf-doc-builder (>=0.3.0)", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "rich", "ruff (>=0.0.241)", "scikit-learn", "scipy", "tqdm", "transformers"]
+quality = ["black (>=23.1,<24.0)", "hf-doc-builder (>=0.3.0)", "ruff (>=0.0.241)"]
+rich = ["rich"]
+sagemaker = ["sagemaker"]
+test-dev = ["datasets", "deepspeed", "evaluate", "scikit-learn", "scipy", "tqdm", "transformers"]
+test-prod = ["parameterized", "pytest", "pytest-subtests", "pytest-xdist"]
+test-trackers = ["comet-ml", "tensorboard", "wandb"]
+testing = ["datasets", "deepspeed", "evaluate", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scikit-learn", "scipy", "tqdm", "transformers"]
+
+[[package]]
 name = "aiofiles"
 version = "23.1.0"
 description = "File support for asyncio."
@@ -5517,4 +5546,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.11"
-content-hash = "f856b5faff46c0000258db70750f6ca1d0802e670b5a9d7a3658b5a5a370d1d2"
+content-hash = "b574b33a5292387c5c9271203f7c9f441dd9ff9ea58512ce96d8faf9129f56ac"
