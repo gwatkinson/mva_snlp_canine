@@ -2,8 +2,8 @@ import click
 import torch
 import torch._dynamo
 
-from mva_snlp_canine.nli.dataset import process_dataset
-from mva_snlp_canine.nli.training import finetune_model
+from mva_snlp_canine.nli.preprocess_dataset import process_dataset
+from mva_snlp_canine.nli.train_models import finetune_model
 from mva_snlp_canine.utils import load_config_nli
 
 torch._dynamo.config.verbose = True
