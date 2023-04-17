@@ -38,12 +38,12 @@ Variables:
 from mva_snlp_canine.utils import get_token
 
 # General parameters
-EXPERIMENT_NAME = "10k_test3"
+EXPERIMENT_NAME = "150k_en_de"
 SEED = 123
 N_JOBS = 12
 NO_PBAR = False
 SAVE_LOCAL = True
-PUSH_TO_HUB = True
+PUSH_TO_HUB = False
 TOKEN = get_token()
 DATASET_IS_TOKENISED = False
 
@@ -59,42 +59,66 @@ HUB_PATH_PREPROCESSED_DATASET = f"Gwatk/{EXPERIMENT_NAME}_xnli_subset"
 HUB_PATH_TOKENIZER_DATASET = f"Gwatk/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
 HUB_TEMPLATE_TRAINING = f"Gwatk/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
 
+# language_to_abbr = {
+#     "english": "en",
+#     "arabic": "ar",
+#     "french": "fr",
+#     "spanish": "es",
+#     "german": "de",
+#     "greek": "el",
+#     "bulgarian": "bg",
+#     "russian": "ru",
+#     "turkish": "tr",
+#     "chinese": "zh",
+#     "thai": "th",
+#     "vietnamese": "vi",
+#     "hindi": "hi",
+#     "urdu": "ur",
+#     "swahili": "sw",
+# }
 # Default values for the NLI dataset processing
 # Options: ["en", "ar", "fr", "es", "de", "el", "bg", "ru", "tr", "zh", "th", "vi", "hi", "ur", "sw"]
-TRAIN_LANGUAGES_SUBSET = ["en", "fr"]
-TRAIN_PROBS = [0.5, 0.5]
+TRAIN_LANGUAGES_SUBSET = ["en"]
+TRAIN_PROBS = [1.0]
 
-TEST_LANGUAGES_SUBSET = ["en", "fr"]
+TEST_LANGUAGES_SUBSET = ["en", "de"]
 TEST_PROBS = [0.5, 0.5]
 
 NUM_TRAIN_SAMPLES = 10000
-NUM_VAL_SAMPLES = 1500
-NUM_TEST_SAMPLES = 2000
+NUM_VAL_SAMPLES = 1000
+NUM_TEST_SAMPLES = 5000
 
 
-# Default values for the NLI models to use for tokenization and finetuning
-MODEL_LIST = ["bert-base-multilingual-cased", "google/canine-s", "google/canine-c"]
-MODEL_POSTFIX = ["bert", "canine_s", "canine_c"]
+#  Default values for the NLI models to use for tokenization and finetuning
+MODEL_LIST = ["google/canine-s", "google/canine-c", "bert-base-multilingual-cased"]
+MODEL_POSTFIX = ["canine_s", "canine_c", "bert"]
 
 
 # Default values for the NLI finetuning
 NUM_LABELS = 3
 
 TRAINING_KWARGS = {
-    # Training parameters
+    # Optimizer parameters
     "do_train": True,
     "do_eval": True,
     "fp16": True,
-    "learning_rate": 5e-5,
-    "weight_decay": 0,
-    "num_train_epochs": 3,
-    "per_device_train_batch_size": 4,
-    "per_device_eval_batch_size": 4,
-    "gradient_accumulation_steps": 8,
+    "auto_find_batch_size": False,
+    "optim": "adamw_torch",
+    "lr_scheduler_type": "linear",
+    "learning_rate": 1e-4,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    # Training parameters
+    "num_train_epochs": 4,
+    "per_device_train_batch_size": 8,
+    "per_device_eval_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "eval_accumulation_steps": 1,
     "gradient_checkpointing": True,
     "torch_compile": False,
-    "overwrite_output_dir": False,
+    "overwrite_output_dir": True,
     # Logging
+    "run_name": "first_run",
     "logging_strategy": "steps",
     "logging_first_step": True,
     "logging_steps": 100,

@@ -85,7 +85,7 @@ TEST_LANGUAGES_SUBSET = ["en", "de"]
 TEST_PROBS = [0.5, 0.5]
 
 NUM_TRAIN_SAMPLES = 150_000
-NUM_VAL_SAMPLES = 2490
+NUM_VAL_SAMPLES = 1000
 NUM_TEST_SAMPLES = 5000
 
 
@@ -98,18 +98,27 @@ MODEL_POSTFIX = ["canine_s", "canine_c", "bert"]
 NUM_LABELS = 3
 
 TRAINING_KWARGS = {
-    # Training parameters
+    # Optimizer parameters
     "do_train": True,
     "do_eval": True,
     "fp16": True,
+    "auto_find_batch_size": False,
+    "optim": "adamw_torch",
+    "lr_scheduler_type": "linear",
+    "learning_rate": 1e-4,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    # Training parameters
     "num_train_epochs": 4,
     "per_device_train_batch_size": 8,
     "per_device_eval_batch_size": 8,
     "gradient_accumulation_steps": 4,
+    "eval_accumulation_steps": 1,
     "gradient_checkpointing": True,
     "torch_compile": False,
     "overwrite_output_dir": True,
     # Logging
+    "run_name": "first_run",
     "logging_strategy": "steps",
     "logging_first_step": True,
     "logging_steps": 100,
@@ -119,16 +128,4 @@ TRAINING_KWARGS = {
     "evaluation_strategy": "epoch",
     "metric_for_best_model": "eval_accuracy",
     "greater_is_better": True,
-}
-
-OPTIMIZER = "NAdam"
-OPTIMIZER_KWARGS = {
-    "lr": 2e-3,
-    "betas": (0.9, 0.999),
-    "weight_decay": 0.01,
-}
-
-SCHEDULER = "ExponentialLR"
-SCHEDULER_KWARGS = {
-    "gamma": 0.9999,
 }
