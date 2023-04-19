@@ -49,6 +49,7 @@ nbqa = "^1.6.3"
 nli_process_data = 'mva_snlp_canine.nli.preprocess_dataset:main'
 nli_tokenize_data = 'mva_snlp_canine.nli.tokenize_dataset:main'
 nli_run_experiment = 'mva_snlp_canine.nli.run_experiment:main'
+nli_create_config = 'mva_snlp_canine.nli.create_new_config:main'
 
 
 [build-system]
