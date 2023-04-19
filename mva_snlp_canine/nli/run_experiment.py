@@ -1,15 +1,18 @@
+import os
+
 import click
 import torch
-import torch._dynamo
 
 from mva_snlp_canine.nli.preprocess_dataset import process_dataset
 from mva_snlp_canine.nli.train_models import finetune_model
-from mva_snlp_canine.utils import load_config_nli
+from mva_snlp_canine.nli.utils import load_config_nli
 
-torch._dynamo.config.verbose = True
+torch.set_float32_matmul_precision("medium")
+max_split_size_mb = 256
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = f"max_split_size_mb:{max_split_size_mb}"
 
 
-@click.command()
+@click.command(no_args_is_help=True)
 @click.argument("config_file_path", type=str)
 def main(config_file_path):
     cfg = load_config_nli(config_file_path)

@@ -6,7 +6,7 @@ from datasets import DatasetDict, load_dataset
 from huggingface_hub import login
 from tqdm.auto import tqdm
 
-from mva_snlp_canine.utils import load_config_nli
+from mva_snlp_canine.nli.utils import load_config_nli
 
 
 # Utility functions

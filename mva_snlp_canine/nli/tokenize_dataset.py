@@ -6,10 +6,10 @@ from huggingface_hub import login
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 
-from mva_snlp_canine.utils import load_config_nli, load_dataset_from_config
+from mva_snlp_canine.nli.utils import load_config_nli, load_dataset_from_config
 
 
-def tokenize_example(example: Any, tokenizer: Any):
+def tokenize_example(example: Any, tokenizer: Any, max_length: int):
     """Tokenize the example.
 
     Args:
@@ -22,7 +22,8 @@ def tokenize_example(example: Any, tokenizer: Any):
     tmp = tokenizer(
         text=example["choosen_premise"],
         text_pair=example["choosen_hypothesis"],
-        truncation=True,
+        truncation="only_first",
+        max_length=max_length,
     )
     return tmp
 
@@ -55,6 +56,7 @@ def tokenize_dataset(
     print("\n--- Loading the tokenizer...")
     # dataset = load_dataset(dataset_name_or_path)  # hub_path = "Gwatk/xnli_subset"
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+    max_length = tokenizer.model_max_length // 2
 
     dataset = dataset.select_columns(["choosen_premise", "choosen_hypothesis", "label"])
 
@@ -62,7 +64,9 @@ def tokenize_dataset(
     print("\n--- Tokenizing the dataset...")
     for phase in tqdm(["train", "validation", "test"], disable=no_pbar):
         dataset[phase] = dataset[phase].map(
-            tokenize_example, num_proc=n_jobs, fn_kwargs={"tokenizer": tokenizer}
+            tokenize_example,
+            num_proc=n_jobs,
+            fn_kwargs={"tokenizer": tokenizer, "max_length": max_length},
         )
 
     dataset = dataset.select_columns(

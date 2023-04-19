@@ -14,7 +14,7 @@ from transformers import (
 )
 
 from mva_snlp_canine.nli.tokenize_dataset import tokenize_dataset
-from mva_snlp_canine.utils import load_config_nli, load_dataset_from_config
+from mva_snlp_canine.nli.utils import load_config_nli, load_dataset_from_config
 
 
 def compute_metrics(eval_pred):

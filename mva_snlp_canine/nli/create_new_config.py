@@ -39,7 +39,7 @@ Variables:
     TRAINING_KWARGS: Default values for the training parameters.
 """
 
-from mva_snlp_canine.utils import get_token
+from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
 EXPERIMENT_NAME = '{experiment_name}'
@@ -56,14 +56,14 @@ DATASET_IS_TOKENISED = False
 # Default paths
 DIR_PATH_PREPROCESSED_DATASET = f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/data/processed_dataset"
 DIR_PATH_TOKENIZED_DATASET = (
-    f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/data/tokenized/" + "{{postfix}}"
+    f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/data/tokenized/" + "_{{postfix}}"
 )
-DIR_TEMPLATE_TRAINING = f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/models/" + "{{postfix}}"
+DIR_TEMPLATE_TRAINING = f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/models/" + "_{{postfix}}"
 
 # HuggingFace Hub paths
 HUB_PATH_PREPROCESSED_DATASET = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_xnli_subset"
-HUB_PATH_TOKENIZER_DATASET = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_tokenized" + "{{postfix}}"
-HUB_TEMPLATE_TRAINING = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_nli_finetuned" + "{{postfix}}"
+HUB_PATH_TOKENIZER_DATASET = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_tokenized" + "_{{postfix}}"
+HUB_TEMPLATE_TRAINING = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_nli_finetuned" + "_{{postfix}}"
 
 # language_to_abbr = {{
 #     "english": "en",
@@ -111,7 +111,7 @@ TRAINING_KWARGS = {{
     "auto_find_batch_size": False,
     "optim": "adamw_torch",
     "lr_scheduler_type": "linear",
-    "learning_rate": 1e-4,
+    "learning_rate": {learning_rate},
     "weight_decay": 0.01,
     "warmup_ratio": 0.05,
     # Training parameters
@@ -119,7 +119,6 @@ TRAINING_KWARGS = {{
     "per_device_train_batch_size": {batch_size},
     "per_device_eval_batch_size": {batch_size},
     "gradient_accumulation_steps": {gradient_accumulation_steps},
-    "eval_accumulation_steps": 1,
     "gradient_checkpointing": True,
     "torch_compile": False,
     "overwrite_output_dir": True,
@@ -174,7 +173,7 @@ TRAINING_KWARGS = {{
 )
 @click.option(
     "--num_val_samples",
-    default=3000,
+    default=2490,
     help="Number of samples to use for validation",
     show_default=True,
     prompt=True,
@@ -194,6 +193,13 @@ TRAINING_KWARGS = {{
     prompt=True,
 )
 @click.option(
+    "--learning_rate",
+    default=1e-4,
+    help="Learning rate",
+    show_default=True,
+    prompt=True,
+)
+@click.option(
     "--batch_size", default=8, help="Batch size", show_default=True, prompt=True
 )
 @click.option(
@@ -205,7 +211,7 @@ TRAINING_KWARGS = {{
 )
 @click.option(
     "--fp16",
-    default=False,
+    default=True,
     help="Whether to use mixed-precision training",
     show_default=True,
     prompt=True,
@@ -219,6 +225,7 @@ def main(
     num_val_samples,
     num_test_samples,
     num_train_epochs,
+    learning_rate,
     batch_size,
     gradient_accumulation_steps,
     fp16,
@@ -233,6 +240,7 @@ def main(
         num_val_samples=num_val_samples,
         num_test_samples=num_test_samples,
         num_train_epochs=num_train_epochs,
+        learning_rate=learning_rate,
         batch_size=batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         fp16=fp16,
