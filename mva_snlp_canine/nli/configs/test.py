@@ -35,7 +35,7 @@ Variables:
     TRAINING_KWARGS: Default values for the training parameters.
 """
 
-from mva_snlp_canine.utils import get_token
+from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
 EXPERIMENT_NAME = "150k_en_de"

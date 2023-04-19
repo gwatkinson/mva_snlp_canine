@@ -35,7 +35,7 @@ Variables:
     TRAINING_KWARGS: Default values for the training parameters.
 """
 
-from mva_snlp_canine.utils import get_token
+from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
 EXPERIMENT_NAME = "300k_en"
@@ -93,7 +93,7 @@ TEST_LANGUAGES_SUBSET = ["en"]
 TEST_PROBS = [1.0]
 
 NUM_TRAIN_SAMPLES = 300000
-NUM_VAL_SAMPLES = 3000
+NUM_VAL_SAMPLES = 2490
 NUM_TEST_SAMPLES = 5000
 
 
@@ -109,7 +109,7 @@ TRAINING_KWARGS = {
     # Optimizer parameters
     "do_train": True,
     "do_eval": True,
-    "fp16": False,
+    "fp16": True,
     "auto_find_batch_size": False,
     "optim": "adamw_torch",
     "lr_scheduler_type": "linear",
@@ -117,11 +117,10 @@ TRAINING_KWARGS = {
     "weight_decay": 0.01,
     "warmup_ratio": 0.05,
     # Training parameters
-    "num_train_epochs": 5,
-    "per_device_train_batch_size": 8,
-    "per_device_eval_batch_size": 8,
-    "gradient_accumulation_steps": 4,
-    "eval_accumulation_steps": 1,
+    "num_train_epochs": 2,
+    "per_device_train_batch_size": 6,
+    "per_device_eval_batch_size": 6,
+    "gradient_accumulation_steps": 3,
     "gradient_checkpointing": True,
     "torch_compile": False,
     "overwrite_output_dir": True,
