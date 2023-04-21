@@ -22,7 +22,7 @@ def tokenize_example(example: Any, tokenizer: Any, max_length: int):
     tmp = tokenizer(
         text=example["choosen_premise"],
         text_pair=example["choosen_hypothesis"],
-        truncation="only_first",
+        truncation=True,
         max_length=max_length,
     )
     return tmp
