@@ -8,9 +8,9 @@ repos:
       - id: check-toml
       - id: check-yaml
       - id: debug-statements
-      - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=crlf]
+      - id: end-of-file-fixer
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
 
