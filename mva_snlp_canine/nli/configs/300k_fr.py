@@ -38,26 +38,34 @@ Variables:
 from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
-EXPERIMENT_NAME = "300k_all"
+EXPERIMENT_NAME = "300k_fr"
+RESULTS_FOLDER = "nli_results"
+HUGGINGFACE_USERNAME = "Gwatk"
 SEED = 123
 N_JOBS = 12
 NO_PBAR = False
 SAVE_LOCAL = True
-PUSH_TO_HUB = True
+PUSH_TO_HUB = False
 TOKEN = get_token()
 DATASET_IS_TOKENISED = False
 
 # Default paths
-DIR_PATH_PREPROCESSED_DATASET = f"nli_results/{EXPERIMENT_NAME}/data/processed_dataset"
-DIR_PATH_TOKENIZED_DATASET = (
-    f"nli_results/{EXPERIMENT_NAME}/data/tokenized/" + "{postfix}"
+DIR_PATH_PREPROCESSED_DATASET = (
+    f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/processed_dataset"
 )
-DIR_TEMPLATE_TRAINING = f"nli_results/{EXPERIMENT_NAME}/models/" + "{postfix}"
+DIR_PATH_TOKENIZED_DATASET = (
+    f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/tokenized/" + "_{postfix}"
+)
+DIR_TEMPLATE_TRAINING = f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/models/" + "_{postfix}"
 
 # HuggingFace Hub paths
-HUB_PATH_PREPROCESSED_DATASET = f"Gwatk/{EXPERIMENT_NAME}_xnli_subset"
-HUB_PATH_TOKENIZER_DATASET = f"Gwatk/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
-HUB_TEMPLATE_TRAINING = f"Gwatk/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
+HUB_PATH_PREPROCESSED_DATASET = f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_xnli_subset"
+HUB_PATH_TOKENIZER_DATASET = (
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
+)
+HUB_TEMPLATE_TRAINING = (
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
+)
 
 # language_to_abbr = {
 #     "english": "en",
@@ -78,100 +86,46 @@ HUB_TEMPLATE_TRAINING = f"Gwatk/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
 # }
 # Default values for the NLI dataset processing
 # Options: ["en", "ar", "fr", "es", "de", "el", "bg", "ru", "tr", "zh", "th", "vi", "hi", "ur", "sw"]
-TRAIN_LANGUAGES_SUBSET = [
-    "en",
-    "ar",
-    "fr",
-    "es",
-    "de",
-    "el",
-    "ru",
-    "tr",
-    "zh",
-    "th",
-    "vi",
-    "hi",
-    "ur",
-    "sw",
-]
-TRAIN_PROBS = [
-    0.09,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-]
+TRAIN_LANGUAGES_SUBSET = ["fr"]
+TRAIN_PROBS = [1.0]
 
-TEST_LANGUAGES_SUBSET = [
-    "en",
-    "ar",
-    "fr",
-    "es",
-    "de",
-    "el",
-    "ru",
-    "tr",
-    "zh",
-    "th",
-    "vi",
-    "hi",
-    "ur",
-    "sw",
-]
-TEST_PROBS = [
-    0.09,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-    0.07,
-]
+TEST_LANGUAGES_SUBSET = ["fr"]
+TEST_PROBS = [1.0]
 
-NUM_TRAIN_SAMPLES = 300_000
-NUM_VAL_SAMPLES = 3000
+NUM_TRAIN_SAMPLES = 300000
+NUM_VAL_SAMPLES = 2490
 NUM_TEST_SAMPLES = 5000
 
 
 #  Default values for the NLI models to use for tokenization and finetuning
-MODEL_LIST = ["bert-base-multilingual-cased", "google/canine-s", "google/canine-c"]
-MODEL_POSTFIX = ["bert", "canine_s", "canine_c"]
+MODEL_LIST = ["google/canine-s", "google/canine-c", "bert-base-multilingual-cased"]
+MODEL_POSTFIX = ["canine_s", "canine_c", "bert"]
 
 
 # Default values for the NLI finetuning
 NUM_LABELS = 3
 
 TRAINING_KWARGS = {
-    # Training parameters
+    # Optimizer parameters
     "do_train": True,
     "do_eval": True,
     "fp16": True,
-    "learning_rate": 5e-5,
-    "weight_decay": 0,
-    "num_train_epochs": 3,
+    "auto_find_batch_size": False,
+    "optim": "adamw_torch",
+    "lr_scheduler_type": "linear",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    # Training parameters
+    "num_train_epochs": 2,
     "per_device_train_batch_size": 8,
     "per_device_eval_batch_size": 8,
     "gradient_accumulation_steps": 4,
     "gradient_checkpointing": True,
     "torch_compile": False,
-    "overwrite_output_dir": False,
+    "overwrite_output_dir": True,
     # Logging
+    "run_name": "first_run",
     "logging_strategy": "steps",
     "logging_first_step": True,
     "logging_steps": 100,

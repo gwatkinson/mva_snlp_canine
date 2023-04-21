@@ -38,7 +38,9 @@ Variables:
 from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
-EXPERIMENT_NAME = "150k_en_de"
+EXPERIMENT_NAME = "10k_fr"
+RESULTS_FOLDER = "nli_results"
+HUGGINGFACE_USERNAME = "Gwatk"
 SEED = 123
 N_JOBS = 12
 NO_PBAR = False
@@ -48,16 +50,22 @@ TOKEN = get_token()
 DATASET_IS_TOKENISED = False
 
 # Default paths
-DIR_PATH_PREPROCESSED_DATASET = f"nli_results/{EXPERIMENT_NAME}/data/processed_dataset"
-DIR_PATH_TOKENIZED_DATASET = (
-    f"nli_results/{EXPERIMENT_NAME}/data/tokenized/" + "{postfix}"
+DIR_PATH_PREPROCESSED_DATASET = (
+    f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/processed_dataset"
 )
-DIR_TEMPLATE_TRAINING = f"nli_results/{EXPERIMENT_NAME}/models/" + "{postfix}"
+DIR_PATH_TOKENIZED_DATASET = (
+    f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/tokenized/" + "_{postfix}"
+)
+DIR_TEMPLATE_TRAINING = f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/models/" + "_{postfix}"
 
 # HuggingFace Hub paths
-HUB_PATH_PREPROCESSED_DATASET = f"Gwatk/{EXPERIMENT_NAME}_xnli_subset"
-HUB_PATH_TOKENIZER_DATASET = f"Gwatk/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
-HUB_TEMPLATE_TRAINING = f"Gwatk/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
+HUB_PATH_PREPROCESSED_DATASET = f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_xnli_subset"
+HUB_PATH_TOKENIZER_DATASET = (
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
+)
+HUB_TEMPLATE_TRAINING = (
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
+)
 
 # language_to_abbr = {
 #     "english": "en",
@@ -78,14 +86,14 @@ HUB_TEMPLATE_TRAINING = f"Gwatk/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
 # }
 # Default values for the NLI dataset processing
 # Options: ["en", "ar", "fr", "es", "de", "el", "bg", "ru", "tr", "zh", "th", "vi", "hi", "ur", "sw"]
-TRAIN_LANGUAGES_SUBSET = ["en"]
+TRAIN_LANGUAGES_SUBSET = ["fr"]
 TRAIN_PROBS = [1.0]
 
-TEST_LANGUAGES_SUBSET = ["en", "de"]
-TEST_PROBS = [0.5, 0.5]
+TEST_LANGUAGES_SUBSET = ["fr"]
+TEST_PROBS = [1.0]
 
 NUM_TRAIN_SAMPLES = 10000
-NUM_VAL_SAMPLES = 1000
+NUM_VAL_SAMPLES = 2490
 NUM_TEST_SAMPLES = 5000
 
 
@@ -105,15 +113,14 @@ TRAINING_KWARGS = {
     "auto_find_batch_size": False,
     "optim": "adamw_torch",
     "lr_scheduler_type": "linear",
-    "learning_rate": 1e-4,
-    "weight_decay": 0.01,
-    "warmup_ratio": 0.05,
+    "learning_rate": 0.00005,
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.01,
     # Training parameters
-    "num_train_epochs": 4,
+    "num_train_epochs": 5,
     "per_device_train_batch_size": 8,
     "per_device_eval_batch_size": 8,
     "gradient_accumulation_steps": 4,
-    "eval_accumulation_steps": 1,
     "gradient_checkpointing": True,
     "torch_compile": False,
     "overwrite_output_dir": True,
@@ -121,7 +128,7 @@ TRAINING_KWARGS = {
     "run_name": "first_run",
     "logging_strategy": "steps",
     "logging_first_step": True,
-    "logging_steps": 100,
+    "logging_steps": 50,
     # Saving strategy
     "save_strategy": "epoch",
     # Evaluation strategy

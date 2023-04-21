@@ -38,7 +38,7 @@ Variables:
 from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
-EXPERIMENT_NAME = "300k_en"
+EXPERIMENT_NAME = "100k_zh_th"
 RESULTS_FOLDER = "nli_results"
 HUGGINGFACE_USERNAME = "Gwatk"
 SEED = 123
@@ -61,10 +61,10 @@ DIR_TEMPLATE_TRAINING = f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/models/" + "{postfi
 # HuggingFace Hub paths
 HUB_PATH_PREPROCESSED_DATASET = f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_xnli_subset"
 HUB_PATH_TOKENIZER_DATASET = (
-    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_tokenized" + "{postfix}"
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
 )
 HUB_TEMPLATE_TRAINING = (
-    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_nli_finetuned" + "{postfix}"
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
 )
 
 # language_to_abbr = {
@@ -86,13 +86,13 @@ HUB_TEMPLATE_TRAINING = (
 # }
 # Default values for the NLI dataset processing
 # Options: ["en", "ar", "fr", "es", "de", "el", "bg", "ru", "tr", "zh", "th", "vi", "hi", "ur", "sw"]
-TRAIN_LANGUAGES_SUBSET = ["en"]
-TRAIN_PROBS = [1.0]
+TRAIN_LANGUAGES_SUBSET = ["zh", "th"]
+TRAIN_PROBS = [0.5, 0.5]
 
-TEST_LANGUAGES_SUBSET = ["en"]
-TEST_PROBS = [1.0]
+TEST_LANGUAGES_SUBSET = ["zh", "th"]
+TEST_PROBS = [0.5, 0.5]
 
-NUM_TRAIN_SAMPLES = 300000
+NUM_TRAIN_SAMPLES = 300_000
 NUM_VAL_SAMPLES = 2490
 NUM_TEST_SAMPLES = 5000
 
@@ -113,14 +113,14 @@ TRAINING_KWARGS = {
     "auto_find_batch_size": False,
     "optim": "adamw_torch",
     "lr_scheduler_type": "linear",
-    "learning_rate": 1e-4,
+    "learning_rate": 5e-5,
     "weight_decay": 0.01,
-    "warmup_ratio": 0.05,
+    "warmup_ratio": 0.01,
     # Training parameters
-    "num_train_epochs": 2,
-    "per_device_train_batch_size": 6,
-    "per_device_eval_batch_size": 6,
-    "gradient_accumulation_steps": 3,
+    "num_train_epochs": 4,
+    "per_device_train_batch_size": 8,
+    "per_device_eval_batch_size": 8,
+    "gradient_accumulation_steps": 4,
     "gradient_checkpointing": True,
     "torch_compile": False,
     "overwrite_output_dir": True,
