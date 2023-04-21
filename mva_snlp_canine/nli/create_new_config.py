@@ -56,9 +56,9 @@ DATASET_IS_TOKENISED = False
 # Default paths
 DIR_PATH_PREPROCESSED_DATASET = f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/data/processed_dataset"
 DIR_PATH_TOKENIZED_DATASET = (
-    f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/data/tokenized/" + "_{{postfix}}"
+    f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/data/tokenized/" + "{{postfix}}"
 )
-DIR_TEMPLATE_TRAINING = f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/models/" + "_{{postfix}}"
+DIR_TEMPLATE_TRAINING = f"{{RESULTS_FOLDER}}/{{EXPERIMENT_NAME}}/models/" + "{{postfix}}"
 
 # HuggingFace Hub paths
 HUB_PATH_PREPROCESSED_DATASET = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_xnli_subset"
@@ -84,11 +84,11 @@ HUB_TEMPLATE_TRAINING = f"{{HUGGINGFACE_USERNAME}}/{{EXPERIMENT_NAME}}_nli_finet
 # }}
 # Default values for the NLI dataset processing
 # Options: ["en", "ar", "fr", "es", "de", "el", "bg", "ru", "tr", "zh", "th", "vi", "hi", "ur", "sw"]
-TRAIN_LANGUAGES_SUBSET = ["en"]
-TRAIN_PROBS = [1.0]
+TRAIN_LANGUAGES_SUBSET = "{train_languages_subset}".split(",")
+TRAIN_PROBS = [1/len(TRAIN_LANGUAGES_SUBSET) for _ in range(len(TRAIN_LANGUAGES_SUBSET))]
 
-TEST_LANGUAGES_SUBSET = ["en"]
-TEST_PROBS = [1.0]
+TEST_LANGUAGES_SUBSET = "{train_languages_subset}".split(",")
+TEST_PROBS = [1/len(TRAIN_LANGUAGES_SUBSET) for _ in range(len(TRAIN_LANGUAGES_SUBSET))]
 
 NUM_TRAIN_SAMPLES = {num_train_samples}
 NUM_VAL_SAMPLES = {num_val_samples}
@@ -143,6 +143,13 @@ TRAINING_KWARGS = {{
     no_args_is_help=True,
 )
 @click.argument("experiment_name")
+@click.option(
+    "--train_languages_subset",
+    default="en",
+    show_default=True,
+    prompt=True,
+    help="Languages to use for training",
+)
 @click.option(
     "--save_local",
     default=True,
@@ -218,6 +225,7 @@ TRAINING_KWARGS = {{
 )
 def main(
     experiment_name,
+    train_languages_subset,
     save_local,
     push_to_hub,
     huggingface_username,
@@ -233,6 +241,7 @@ def main(
     # fill in the template with the cli values
     config = CONFIG_TEMPLATE.format(
         experiment_name=experiment_name,
+        train_languages_subset=train_languages_subset,
         save_local=save_local,
         push_to_hub=push_to_hub,
         huggingface_username=huggingface_username,
@@ -250,6 +259,8 @@ def main(
     # write the config to a file
     with open(output_path / (experiment_name + ".py"), "w") as f:
         f.write(config)
+
+    click.echo(f"Config file saved to {output_path / (experiment_name + '.py')}")
 
 
 if __name__ == "__main__":
