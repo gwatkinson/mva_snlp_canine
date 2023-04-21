@@ -26,6 +26,7 @@ torch = "^2.0.0"
 evaluate = "^0.4.0"
 tensorboard = "^2.12.0"
 accelerate = "^0.18.0"
+plotly = "^5.14.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -48,8 +49,9 @@ nbqa = "^1.6.3"
 [tool.poetry.scripts]
 nli_process_data = 'mva_snlp_canine.nli.preprocess_dataset:main'
 nli_tokenize_data = 'mva_snlp_canine.nli.tokenize_dataset:main'
-nli_run_experiment = 'mva_snlp_canine.nli.run_experiment:main'
 nli_create_config = 'mva_snlp_canine.nli.create_new_config:main'
+nli_run_experiment = 'mva_snlp_canine.nli.run_experiment:main'
+nli_evaluate_experiment = 'mva_snlp_canine.nli.evaluate_models:main'
 
 
 [build-system]
