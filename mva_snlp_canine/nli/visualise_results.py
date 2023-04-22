@@ -126,7 +126,7 @@ def visualise_exp(exp_name, num=None, languages=None, attacked=False):
     num = num or exp_name.split("_")[0][:-1]
     languages = languages or ", ".join(exp_name.split("_")[1:])
 
-    metric_df = load_metric_df(exp_dir)
+    metric_df = load_metric_df(exp_dir, attacked=attacked)
 
     bar_path = (
         f"{exp_dir}/results/barplot_metrics.pdf"
