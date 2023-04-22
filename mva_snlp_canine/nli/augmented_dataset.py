@@ -1,10 +1,12 @@
-"""Module that evaluates the model on all languages contained on the test dataset, regardless of the language used to train the model."""
-
 import glob
 import json
 from pathlib import Path
+from typing import Any
 
 import click
+import nlpaug.augmenter.char as nac
+import nlpaug.augmenter.word as naw
+import nlpaug.flow as naf
 import pandas as pd
 import torch
 from datasets import load_dataset
@@ -14,38 +16,38 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from mva_snlp_canine.nli.tokenize_dataset import tokenize_example
 from mva_snlp_canine.nli.train_models import compute_metrics
 
-language_subset = [
-    "en",
-    "ar",
-    "fr",
-    "es",
-    "de",
-    "el",
-    "bg",
-    "ru",
-    "tr",
-    "zh",
-    "th",
-    "vi",
-    "hi",
-    "ur",
-    "sw",
-]
 
-
-def evaluate_model_on_language(model_path: str, language: str):
-    """Evaluate the model on the test dataset of the given language."""
-    model_name = model_path.split("/")[-2].strip("_")
-    print(f"=== Language : {language} | Model : {model_name}")
+def augment_dataset(language):
     dataset = load_dataset("xnli", language, split="test")
+
+    aug = naf.Sometimes(
+        [
+            nac.RandomCharAug(action="delete"),
+            nac.RandomCharAug(action="swap"),
+            naw.SplitAug(),
+        ]
+    )
+
+    print(f"--- Augmenting the dataset {language}...")
+    dataset = dataset.map(lambda x: {"augmented_premise": aug.augment(x["premise"])[0]})
+    dataset = dataset.map(
+        lambda x: {"augmented_hypothesis": aug.augment(x["hypothesis"])[0]}
+    )
 
     dataset = dataset.rename_columns(
         {
-            "premise": "choosen_premise",
-            "hypothesis": "choosen_hypothesis",
+            "augmented_premise": "choosen_premise",
+            "augmented_hypothesis": "choosen_hypothesis",
             "label": "label",
         }
     )
+    return dataset
+
+
+def evaluate_model_on_attack(model_path: str, dataset: Any, language: str):
+    """Evaluate the model on the test dataset of the given language."""
+    model_name = model_path.split("/")[-2].strip("_")
+    print(f"=== Evaluating the model {model_name}...")
 
     print(f"--- Loading the model and tokenizer from {model_path}...")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -53,13 +55,13 @@ def evaluate_model_on_language(model_path: str, language: str):
     model.eval()
 
     print("--- Tokenizing the dataset...")
-    dataset = dataset.map(
+    new_dataset = dataset.map(
         tokenize_example,
         num_proc=12,
         fn_kwargs={"tokenizer": tokenizer, "max_length": None},
     )
 
-    dataset = dataset.select_columns(
+    new_dataset = new_dataset.select_columns(
         ["input_ids", "attention_mask", "token_type_ids", "label"]
     )
 
@@ -72,7 +74,7 @@ def evaluate_model_on_language(model_path: str, language: str):
     )
 
     print("--- Evaluating the model...")
-    predictions, label_ids, metrics = trainer.predict(dataset)
+    predictions, label_ids, metrics = trainer.predict(new_dataset)
     metrics["language"] = language
     metrics["model_path"] = model_path
     metrics["model"] = model_name
@@ -80,7 +82,7 @@ def evaluate_model_on_language(model_path: str, language: str):
     return predictions, label_ids, metrics
 
 
-def evaluate_experiment(exp_dir: str):
+def evaluate_experiment_with_attack(exp_dir: str, language_subset: list):
     print(f"=== Evaluating the experiment {exp_dir}...")
 
     trainer_states = glob.glob(f"{exp_dir}/models/**/trainer_state.json")
@@ -90,10 +92,15 @@ def evaluate_experiment(exp_dir: str):
     # language_label_ids = {}
     for language in tqdm(language_subset):
         for file in trainer_states:
+            dataset = augment_dataset(language)
+
             with open(file) as f:
                 trainer_state = json.load(f)
-            predictions, label_ids, metrics = evaluate_model_on_language(
-                trainer_state["best_model_checkpoint"], language
+
+            predictions, label_ids, metrics = evaluate_model_on_attack(
+                trainer_state["best_model_checkpoint"],
+                dataset=dataset,
+                language=language,
             )
             language_metrics.append(metrics)
             # language_predictions[language] = predictions.tolist()
@@ -119,12 +126,25 @@ def evaluate_experiment(exp_dir: str):
 # click cli command to evaluate an experiment
 @click.command()
 @click.argument("exp_name", type=str)
-def main(exp_name: str):
+@click.option(
+    "--language_subset",
+    default="en,fr",
+    type=str,
+    help='The languages to evaluate the model on. \n Options are ["ar", "bg", "de", "el", "en", "es", "fr", "hi", "ru", "sw", "th", "tr", "ur", "vi", "zh"]',
+    show_default=True,
+    prompt=True,
+)
+def main(exp_name: str, language_subset: str):
     """Evaluate the experiment in the given directory."""
     exp_dir = f"nli_results/{exp_name}"
-    language_metrics_df = evaluate_experiment(exp_dir)
+    language_list = language_subset.split(",")
+    language_metrics_df = evaluate_experiment_with_attack(exp_dir, language_list)
 
-    print(f"--- Saving the metrics in {exp_dir}/results/metrics.csv ...")
-    save_path = Path(f"{exp_dir}/results/metrics.csv")
+    print(f"--- Saving the metrics in {exp_dir}/results/attacked_metrics.csv ...")
+    save_path = Path(f"{exp_dir}/results/attacked_metrics.csv")
     save_path.parent.mkdir(parents=True, exist_ok=True)
     language_metrics_df.to_csv(save_path, index=False)
+
+
+if __name__ == "__main__":
+    main()
