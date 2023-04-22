@@ -65,7 +65,7 @@ profile = "black"
 float_to_top = true
 
 [tool.flake8]
-ignore = ['E203', 'E501']
+ignore = ['E203', 'E501', 'W503']
 max-line-length = 100
 count = true
 docstring-convention = 'google'
