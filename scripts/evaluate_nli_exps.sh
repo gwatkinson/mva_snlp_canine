@@ -26,12 +26,6 @@ nli_evaluate_experiment 100k_zh_th
 echo "========================"
 
 
-echo "Evaluating 300k_zh_th"
-echo "------------------------"
-nli_evaluate_experiment 300k_zh_th
-echo "========================"
-
-
 echo "Evaluating 300k_all"
 echo "------------------------"
 nli_evaluate_experiment 300k_all
