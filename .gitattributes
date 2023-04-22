@@ -1,0 +1,5 @@
+*.pdf linguist-detectable=false
+*.html linguist-detectable=false
+*.ipynb linguist-detectable=false
+*.json linguist-detectable=false
+*.csv linguist-detectable=false
