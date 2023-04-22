@@ -21,22 +21,24 @@ This is a group project realised by :
 git clone https://github.com/gwatkinson/mva_snlp_canine
 ```
 
-2. Install the project
-- With `poetry` ([installation](https://python-poetry.org/docs/#installation)):
+2. Install the project and dependencies, creating a virtual environment with `poetry` (you need to [install poetry](https://python-poetry.org/docs/#installation) it beforehand):
 ```bash
 poetry install
 ```
-- With `pip` :
+
+3. Activate the environment
 ```bash
-pip install -e .
+source $(poetry env info --path)/bin/activate  # for linux
+# & ((poetry env info --path) + "\Scripts\activate.ps1")  # for windows powershell
+# poetry shell  # or this spawns a new shell
 ```
 
-3. Install pre-commit
+4. Install pre-commit
 ```bash
 pre-commit install
 ```
 
-4. Use Pytorch with GPU support (optional). Use this if Pytorch doesn't see your GPU. This reinstalls Pytorch in the virtual environment, and needs to be rerun after each modification of the environment.
+5. Use Pytorch with GPU support (optional). Use this if Pytorch doesn't see your GPU. This reinstalls Pytorch in the virtual environment, and needs to be rerun after each modification of the environment.
 ```bash
 poe torch_cuda
 ```
@@ -47,84 +49,132 @@ poe torch_cuda
 
 In this section, we will describe how to reproduce the experiments for the NLI task.
 
-#### Download and preprocess the dataset
+All the functions and configs used for those experiments are in the `mva_snlp_canine/nli` folder.
 
-We used the xnli dataset from the [HuggingFace datasets](https://huggingface.co/datasets/xnli) library.
+#### Creating a config file
 
-But to keep it simple, we used only a sample of the total dataset, and a selection of languages. We also kept some low ressource languages in the test split, not seen in the training and validation splits.
+The experiments can be configured from config files.
 
-To download and preprocess the dataset, run the following command :
+To generate a generic one with some prompts, you can run:
+
 ```bash
-nli_process_data EXPERIMENT_NAME
+nli_create_config [OPTIONS] EXPERIMENT_NAME
 ```
 
-Usage:
+Usage :
+
 ```bash
-Usage: nli_process_data [OPTIONS] EXPERIMENT_NAME
+nli_create_config [OPTIONS] EXPERIMENT_NAME
+
+  Command that creates a config file to run an experiment.
 
 Options:
-  -nt, --num_train_samples INTEGER    Number of training samples.  [default: 30000]
-  -nv, --num_val_samples INTEGER      Number of validation samples.  [default: 1500]
-  -ns, --num_test_samples INTEGER     Number of test samples.  [default: 2000]
-  -tls, --train_language_subset LIST  Languages to keep in the train and validation set.
-                                      [default: en, fr, ar, hi, el, ru, tr, zh]
-  -tlp, --train_probs LIST            Probabilities of the languages to keep in the train and validation set.
-                                      [default: 0.5, 0.3, 0.05, 0.05, 0.025, 0.025, 0.025, 0.025]
-  -sls, --test_language_subset LIST   Languages to keep in the test set.
-                                      [default: en, fr, es, bg, th, ur, sw]
-  -slp, --test_probs LIST             Probabilities of the languages to keep in the test set.
-                                      [default: 0.5, 0.3, 0.075, 0.05, 0.025, 0.025, 0.025]
-  -o, --save_path TEXT                Path to save the dataset.  [default: data/nli/processed_dataset]
-  -h, --hub_path TEXT                 Path to the dataset on the HuggingFace Hub. [default: Gwatk/xnli_subset]
-  --seed INTEGER                      Seed for the random number generator. [default: 123]
-  -j, --n_jobs INTEGER                Number of jobs to run in parallel. [default: 12]
-  --no_pbar BOOLEAN                   Disable the progress bar.  [default: False]
-  --token TEXT                        Token to login to the hub.  [default:None]
-  --help                              Show this message and exit.
+  --train_languages_subset TEXT   Languages to use for training  [default: en]
+  --save_local BOOLEAN            Save the processed dataset locally
+                                  [default: True]
+  --push_to_hub BOOLEAN           Push the processed dataset to the
+                                  HuggingFace Hub  [default: False]
+  --huggingface_username TEXT     HuggingFace username  [default: Gwatk]
+  --num_train_samples INTEGER     Number of samples to use for training
+                                  [default: 300000]
+  --num_val_samples INTEGER       Number of samples to use for validation
+                                  [default: 2490]
+  --num_test_samples INTEGER      Number of samples to use for testing
+                                  [default: 5000]
+  --num_train_epochs INTEGER      Number of training epochs  [default: 5]
+  --learning_rate FLOAT           Learning rate  [default: 0.0001]
+  --batch_size INTEGER            Batch size  [default: 8]
+  --gradient_accumulation_steps INTEGER
+                                  Number of gradient accumulation steps
+                                  [default: 4]
+  --fp16 BOOLEAN                  Whether to use mixed-precision training
+                                  [default: True]
+  --help                          Show this message and exit.
 ```
 
+Then, you should look into the newly created file in the `mva_snlp_canine/nli/configs` folder and change additional options if needed (especially the training arguments).
 
-#### Tokenize the dataset using different models
+#### Running an experiment
 
-We used the [HuggingFace Tokenizers](https://huggingface.co/docs/tokenizers/python/latest/) library to tokenize the dataset, and create datasets containing the tokenized inputs for different models.
+From a config file, you just need to run:
 
-
-To tokenize the previously created dataset, run the following command :
 ```bash
-nli_tokenize_data EXPERIMENT_NAME
+nli_run_experiment EXPERIMENT_NAME
 ```
 
-Usage:
+This will train the models, and can be quite long.
+
+A bash file in the `scripts` folder also exists, that reproduces all the experiments mentionned in our report:
+
 ```bash
-Usage: nli_tokenize_data [OPTIONS] EXPERIMENT_NAME
+source scripts/run_nli_exps.sh
+```
+
+#### Evaluating the experiments
+
+Once the model is trained, to evaluate it on the test set and on all languages, run:
+
+```bash
+nli_evaluate_experiment EXPERIMENT_NAME
+```
+
+The associated script is:
+
+```bash
+source scripts/evaluate_nli_exps.sh
+```
+
+#### Generating some graphs from the metrics dataframe
+
+The evaluation step returns a dataframe, to visualize the results, run:
+
+```bash
+nli_visualise_results [OPTIONS] EXP_NAME
 
 Options:
-  -d, --dataset_name_or_path TEXT   Name or path of the dataset to tokenize.
-                                    [default: Gwatk/{experiment_name}_xnli_subset]
-  -m, --model_list LIST             List of models to use for tokenization.
-                                    [default: bert-base-multilingual-cased, google/canine-s, google/canine-c]
-  -p, --model_postfix LIST          List of prefixes to use for the tokenized datasets.
-                                    [default: bert, canine_s, canine_c]
-  -o, --save_path TEXT              Path to save the dataset.
-                                    [default: nli_results/{experiment_name}/data/tokenized/{postfix}]
-  -h, --hub_path TEXT               Path to the dataset on the HuggingFace Hub.
-                                    [default: Gwatk/{experiment_name}_xnli_subset_tokenized_{postfix}]
-  -j, --n_jobs INTEGER              Number of jobs to run in parallel. [default: 12]
-  --no_pbar BOOLEAN                 Disable the progress bar.  [default: False]
-  --token TEXT                      Token to login to the hub.  [default:None]
-  --help                            Show this message and exit.
+  --num TEXT        Number of samples used in the training set, optional.
+  --languages TEXT  Languages used in the training set, optional.
+  --attacked        Whether to visualise attacked metrics, default fault.
+  --help            Show this message and exit.
 ```
 
-#### Train and evaluate the models
+The associated script is:
 
-To train and evaluate the models, run the following command :
 ```bash
-nli_train EXPERIMENT_NAME
+source scripts/visualise_nli_results.sh
 ```
 
-Usage:
-```bash
-Usage: nli_train [OPTIONS] EXPERIMENT_NAME
+#### Evaluate the models on perturbed datasets
 
-...
+Lastly, we aslo used [`nlpaug`](https://github.com/makcedward/nlpaug) to generate some perturbed inputs and then look at how the model reacts.
+
+To generate these datasets and evaluate, run:
+
+```bash
+nli_augmented_dataset [OPTIONS] EXP_NAME
+
+  Evaluate the experiment in the given directory.
+
+Options:
+  --language_subset TEXT  The languages to evaluate the model on.  Options are
+                          ["ar", "bg", "de", "el", "en", "es", "fr", "hi",
+                          "ru", "sw", "th", "tr", "ur", "vi", "zh"]  [default:
+                          en,fr]
+  --help                  Show this message and exit.
+```
+
+Then you can use the previous command to generate plots, using the `--attacked` flag.
+
+The associated script is:
+
+```bash
+source scripts/evaluate_nli_attacks.sh
+```
+
+#### Running all the experiments
+
+Finally the following script, runs all the previous script in the right order:
+
+```bash
+source scripts/nli_run_all.sh
 ```
