@@ -11,8 +11,8 @@ echo "========================"
 
 echo "Evaluating modified 300k_fr"
 echo "------------------------"
-nli_augmented_dataset 300k_all --language_subset 'en,fr,es,bg,ru,de,el'
-nli_visualise_results 300k_all --attacked
+nli_augmented_dataset 300k_fr --language_subset 'en,fr,es,bg,ru,de,el'
+nli_visualise_results 300k_fr --attacked
 echo "========================"
 
 
