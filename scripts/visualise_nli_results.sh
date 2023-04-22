@@ -1,38 +1,38 @@
-echo "Evaluating NLI experiments"
+echo "Plot NLI experiments"
 echo "========================"
 
 
-echo "Evaluating 100k_en"
+echo "Plot 100k_en"
 echo "------------------------"
-nli_evaluate_experiment 100k_en
+nli_visualise_results 100k_en
 echo "========================"
 
 
-echo "Evaluating 300k_fr"
+echo "Plot 300k_fr"
 echo "------------------------"
-nli_evaluate_experiment 300k_fr
+nli_visualise_results 300k_fr
 echo "========================"
 
 
-echo "Evaluating 200k_ar_tr"
+echo "Plot 200k_ar_tr"
 echo "------------------------"
-nli_evaluate_experiment 200k_ar_tr
+nli_visualise_results 200k_ar_tr
 echo "========================"
 
 
-echo "Evaluating 100k_zh_th"
+echo "Plot 100k_zh_th"
 echo "------------------------"
-nli_evaluate_experiment 100k_zh_th
+nli_visualise_results 100k_zh_th
 echo "========================"
 
 
-echo "Evaluating 300k_zh_th"
+echo "Plot 300k_zh_th"
 echo "------------------------"
-nli_evaluate_experiment 300k_zh_th
+nli_visualise_results 300k_zh_th
 echo "========================"
 
 
-echo "Evaluating 300k_all"
+echo "Plot 300k_all"
 echo "------------------------"
-nli_evaluate_experiment 300k_all
+nli_visualise_results 300k_all
 echo "========================"

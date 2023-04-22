@@ -42,3 +42,9 @@ echo "Running 300k_zh_th"
 echo "------------------------"
 nli_run_experiment 300k_zh_th
 echo "========================"
+
+
+echo "Running 300k_all"
+echo "------------------------"
+nli_run_experiment 300k_all
+echo "========================"
