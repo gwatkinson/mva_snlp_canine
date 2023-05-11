@@ -38,7 +38,7 @@ Variables:
 from mva_snlp_canine.nli.utils import get_token
 
 # General parameters
-EXPERIMENT_NAME = "10k_zh"
+EXPERIMENT_NAME = "100k_fr"
 RESULTS_FOLDER = "nli_results"
 HUGGINGFACE_USERNAME = "Gwatk"
 SEED = 123
@@ -54,17 +54,17 @@ DIR_PATH_PREPROCESSED_DATASET = (
     f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/processed_dataset"
 )
 DIR_PATH_TOKENIZED_DATASET = (
-    f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/tokenized/" + "_{postfix}"
+    f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/data/tokenized/" + "{postfix}"
 )
-DIR_TEMPLATE_TRAINING = f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/models/" + "_{postfix}"
+DIR_TEMPLATE_TRAINING = f"{RESULTS_FOLDER}/{EXPERIMENT_NAME}/models/" + "{postfix}"
 
 # HuggingFace Hub paths
 HUB_PATH_PREPROCESSED_DATASET = f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_xnli_subset"
 HUB_PATH_TOKENIZER_DATASET = (
-    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_tokenized" + "_{postfix}"
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_tokenized" + "{postfix}"
 )
 HUB_TEMPLATE_TRAINING = (
-    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_nli_finetuned" + "_{postfix}"
+    f"{HUGGINGFACE_USERNAME}/{EXPERIMENT_NAME}_nli_finetuned" + "{postfix}"
 )
 
 # language_to_abbr = {
@@ -86,20 +86,22 @@ HUB_TEMPLATE_TRAINING = (
 # }
 # Default values for the NLI dataset processing
 # Options: ["en", "ar", "fr", "es", "de", "el", "bg", "ru", "tr", "zh", "th", "vi", "hi", "ur", "sw"]
-TRAIN_LANGUAGES_SUBSET = ["zh"]
+TRAIN_LANGUAGES_SUBSET = ["fr"]
 TRAIN_PROBS = [1.0]
 
-TEST_LANGUAGES_SUBSET = ["zh"]
+TEST_LANGUAGES_SUBSET = ["fr"]
 TEST_PROBS = [1.0]
 
-NUM_TRAIN_SAMPLES = 10000
+NUM_TRAIN_SAMPLES = 100_000
 NUM_VAL_SAMPLES = 2490
-NUM_TEST_SAMPLES = 5000
+NUM_TEST_SAMPLES = 100
 
 
 #  Default values for the NLI models to use for tokenization and finetuning
-MODEL_LIST = ["google/canine-s", "google/canine-c", "bert-base-multilingual-cased"]
-MODEL_POSTFIX = ["canine_s", "canine_c", "bert"]
+# MODEL_LIST = ["google/canine-s", "google/canine-c", "bert-base-multilingual-cased", "camembert-base"]
+# MODEL_POSTFIX = ["canine_s", "canine_c", "bert", "camembert"]
+MODEL_LIST = ["sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"]
+MODEL_POSTFIX = ["MiniLM"]
 
 
 # Default values for the NLI finetuning
@@ -113,14 +115,14 @@ TRAINING_KWARGS = {
     "auto_find_batch_size": False,
     "optim": "adamw_torch",
     "lr_scheduler_type": "linear",
-    "learning_rate": 0.00005,
-    "weight_decay": 0.0,
-    "warmup_ratio": 0.01,
+    "learning_rate": 5e-5,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
     # Training parameters
     "num_train_epochs": 5,
-    "per_device_train_batch_size": 8,
-    "per_device_eval_batch_size": 8,
-    "gradient_accumulation_steps": 4,
+    "per_device_train_batch_size": 6,
+    "per_device_eval_batch_size": 4,
+    "gradient_accumulation_steps": 8,
     "gradient_checkpointing": True,
     "torch_compile": False,
     "overwrite_output_dir": True,
@@ -128,7 +130,7 @@ TRAINING_KWARGS = {
     "run_name": "first_run",
     "logging_strategy": "steps",
     "logging_first_step": True,
-    "logging_steps": 50,
+    "logging_steps": 100,
     # Saving strategy
     "save_strategy": "epoch",
     # Evaluation strategy

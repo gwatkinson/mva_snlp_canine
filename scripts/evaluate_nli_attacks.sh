@@ -18,7 +18,7 @@ echo "========================"
 
 echo "Evaluating modified 200k_ar_tr"
 echo "------------------------"
-nli_augmented_dataset 200k_ar_tr --language_subset 'ar,tr'
+nli_augmented_dataset 200k_ar_tr --language_subset 'ar,tr,ur,hi,sw,es'
 nli_visualise_results 200k_ar_tr --attacked
 echo "========================"
 

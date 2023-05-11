@@ -14,6 +14,12 @@ nli_run_experiment 10k_fr
 echo "========================"
 
 
+echo "Running 100k_fr"
+echo "------------------------"
+nli_run_experiment 100k_fr
+echo "========================"
+
+
 echo "Running 300k_fr"
 echo "------------------------"
 nli_run_experiment 300k_fr
@@ -26,9 +32,9 @@ nli_run_experiment 200k_ar_tr
 echo "========================"
 
 
-echo "Running 10k_zh"
+echo "Running 10k_zh_th"
 echo "------------------------"
-nli_run_experiment 10k_zh
+nli_run_experiment 10k_zh_th
 echo "========================"
 
 
