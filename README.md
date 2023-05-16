@@ -13,7 +13,9 @@ This is a group project realised by :
 * Marine Astruc
 * Javier Ramos Gutiérrez
 
-Each task was realized separately, and the lack of time led to the code not being well harmonized. Don't hesitate to contact any of us if you have any questions.
+Each task was realized separately, and the lack of time led to the code not being well harmonized.
+
+Don't hesitate to contact any of us if you have any questions.
 
 ## Installation
 
