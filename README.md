@@ -13,26 +13,28 @@ This is a group project realised by :
 * Marine Astruc
 * Javier Ramos Gutiérrez
 
+Each task was realized separately, and the lack of time led to the code not being well harmonized. Don't hesitate to contact any of us if you have any questions.
+
 ## Installation
 
-1. Clone the repository
+1. Clone the repository.
 ```bash
 git clone https://github.com/gwatkinson/mva_snlp_canine
 ```
 
-2. Install the project and dependencies, creating a virtual environment with `poetry` (you need to [install poetry](https://python-poetry.org/docs/#installation) it beforehand):
+2. Install the project and dependencies, creating a virtual environment with `poetry` (you need to [install poetry](https://python-poetry.org/docs/#installation) it beforehand). If you prefer to use an existing environment, you just have to activate it and run the same command:
 ```bash
 poetry install
 ```
 
-3. Activate the environment
+3. Activate the created environment if needed.
 ```bash
 source $(poetry env info --path)/bin/activate  # for linux
 # & ((poetry env info --path) + "\Scripts\activate.ps1")  # for windows powershell
 # poetry shell  # or this spawns a new shell
 ```
 
-4. Install pre-commit
+4. Install pre-commit, if you are planning to add code.
 ```bash
 pre-commit install
 ```
