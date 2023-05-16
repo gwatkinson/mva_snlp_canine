@@ -50,6 +50,16 @@ In this section, we will describe how to reproduce the experiments for the NLI t
 
 All the functions and configs used for those experiments are in the `mva_snlp_canine/nli` folder.
 
+#### Running all the experiments
+
+To run all the experiments without changing anything (really long), run:
+
+```bash
+source scripts/nli_run_all.sh
+```
+
+Else, you can look at the following to create or run another experiment.
+
 #### Creating a config file
 
 The experiments can be configured from config files.
@@ -168,12 +178,4 @@ The associated script is:
 
 ```bash
 source scripts/evaluate_nli_attacks.sh
-```
-
-#### Running all the experiments
-
-Finally the following script, runs all the previous script in the right order:
-
-```bash
-source scripts/nli_run_all.sh
 ```
